@@ -1,0 +1,59 @@
+/* ==========================================================================
+   SPONSORED-CAP REVIEW QUEUE — staff approve/reject per-shop cap requests.
+   Rides the shared .chart-card shell (analytics.css); these are the extras.
+   ========================================================================== */
+
+.spcapq__empty {
+  padding: 1rem;
+  text-align: center;
+  color: var(--color-text-muted, #6b7280);
+  font-size: 0.9rem;
+}
+
+.spcapq__list {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.spcapq__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(2, 44, 34, 0.10);
+  border-radius: var(--radius-md, 8px);
+}
+
+.spcapq__info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.spcapq__shop { font-weight: 600; font-size: 0.9rem; color: var(--color-text-primary); }
+.spcapq__req { font-size: 0.82rem; color: var(--color-text-secondary); }
+
+.spcapq__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.spcapq__amount input {
+  width: 4rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid rgba(2, 44, 34, 0.18);
+  border-radius: var(--radius-md, 6px);
+  font-size: 0.85rem;
+}
+
+.spcapq__approve { font-size: 0.82rem; padding: 0.35rem 0.9rem; }
+.spcapq__reject {
+  font-size: 0.82rem;
+  padding: 0.35rem 0.9rem;
+  color: var(--color-danger, #b3261e);
+  background: transparent;
+  border: 1px solid rgba(179, 38, 30, 0.3);
+  border-radius: var(--radius-md, 6px);
+}

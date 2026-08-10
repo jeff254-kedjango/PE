@@ -1,0 +1,127 @@
+/* ==========================================================================
+   CUSTOM SELECT — Shared dropdown used by SortControls & SearchPanel
+   Design: Midnight Emerald + Soft Sand + Electric Lime accent
+   ========================================================================== */
+
+.custom-select {
+  position: relative;
+  width: 100%;
+}
+
+/* ── Trigger button ── */
+.custom-select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1.5px solid rgba(2, 44, 34, 0.12);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+  text-align: left;
+}
+
+.custom-select__trigger:hover {
+  border-color: var(--color-primary);
+}
+
+.custom-select__trigger:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-muted);
+}
+
+.custom-select__trigger--open {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-muted);
+}
+
+.custom-select__placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* ── Chevron icon ── */
+.custom-select__chevron {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  transform: rotate(90deg);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.custom-select__chevron--open {
+  transform: rotate(-90deg);
+}
+
+/* ── Dropdown menu ── */
+.custom-select__menu {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  right: 0;
+  z-index: var(--z-dropdown, 100);
+  list-style: none;
+  margin: 0;
+  padding: var(--space-1) 0;
+  background: var(--color-bg-white);
+  border: 1px solid rgba(2, 44, 34, 0.1);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(2, 44, 34, 0.12), 0 2px 8px rgba(2, 44, 34, 0.06);
+  max-height: 240px;
+  overflow-y: auto;
+  animation: customSelectFadeIn 0.15s var(--ease-out);
+}
+
+@keyframes customSelectFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Option items ── */
+.custom-select__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.custom-select__option:hover {
+  background: rgba(2, 44, 34, 0.04);
+}
+
+.custom-select__option--active {
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
+  background: rgba(2, 44, 34, 0.04);
+}
+
+.custom-select__option--active svg {
+  color: var(--color-accent);
+}
+
+/* ── Scrollbar ── */
+.custom-select__menu::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-select__menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-select__menu::-webkit-scrollbar-thumb {
+  background: rgba(2, 44, 34, 0.15);
+  border-radius: var(--radius-full);
+}

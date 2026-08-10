@@ -1,0 +1,83 @@
+/* ==========================================================================
+   FAVORITES PAGE — Saved properties grid with empty state
+   ========================================================================== */
+
+.favorites-page {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-6) var(--space-16);
+  min-height: 100vh;
+}
+
+.favorites-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+  margin-top: var(--space-20);
+}
+
+.favorites-header h1 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(var(--text-2xl), 2.6vw, var(--text-4xl));
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+}
+
+/* ── Controls (count + view toggle) ── */
+.favorites-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* ── Empty State ── */
+.favorites-empty {
+  background: var(--color-bg-white);
+  border: 1px dashed rgba(2, 44, 34, 0.16);
+  border-radius: var(--radius-xl);
+  padding: var(--space-16) var(--space-8);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.favorites-empty__icon {
+  color: rgba(2, 44, 34, 0.2);
+  margin-bottom: var(--space-2);
+}
+
+.favorites-empty__cta {
+  display: inline-flex;
+  margin-top: var(--space-4);
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  padding: var(--space-3) var(--space-8);
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  text-decoration: none;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.favorites-empty__cta:hover {
+  opacity: 0.9;
+}
+
+/* ── Responsive ── */
+@media (max-width: 720px) {
+  .favorites-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .favorites-page {
+    padding: var(--space-8) var(--space-4) var(--space-20);
+  }
+}

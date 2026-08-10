@@ -1,0 +1,32 @@
+/* ==========================================================================
+   ICON — Container component with size variants
+   ========================================================================== */
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: inherit;
+  transition: color var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
+}
+
+.icon-container.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.icon-container svg {
+  width: var(--icon-size, 24px);
+  height: var(--icon-size, 24px);
+  display: block;
+}
+
+/* Size variants */
+.icon-size-xs  { --icon-size: 16px; min-width: 16px; min-height: 16px; }
+.icon-size-sm  { --icon-size: 20px; min-width: 20px; min-height: 20px; }
+.icon-size-md  { --icon-size: 24px; min-width: 24px; min-height: 24px; }
+.icon-size-lg  { --icon-size: 28px; min-width: 28px; min-height: 28px; }
+.icon-size-xl  { --icon-size: 32px; min-width: 32px; min-height: 32px; }
+.icon-size-xxl { --icon-size: 40px; min-width: 40px; min-height: 40px; }

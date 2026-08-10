@@ -1,0 +1,462 @@
+/* ==========================================================================
+   NAVBAR — Sticky top navigation bar
+   Always solid white background. Hide-on-scroll for mobile.
+   ========================================================================== */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-navbar);
+  padding: var(--space-3) 0;
+  transition: transform var(--duration-normal) var(--ease-out);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Hidden on mobile scroll-down */
+.navbar--hidden {
+  transform: translateY(-100%);
+}
+
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--navbar-height);
+}
+
+/* ── Logo ── */
+.navbar__logo {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-primary);
+  letter-spacing: -0.03em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.08em;            /* em, so the wordmark/mark spacing holds at any font-size */
+  flex: none;             /* the brand never shrinks when nav content competes for width */
+  white-space: nowrap;    /* "weespas" + mark must never wrap mid-brand */
+}
+
+/* The mark itself is sized by the shared .brand-mark rule (styles/utilities.css) — it tracks
+   this font-size in `em`, so there is deliberately no width/height here to drift out of sync. */
+
+/* ── Desktop Nav Links ── */
+.navbar__links {
+  position: relative; /* anchor for .navbar__mega-anchor (mega menu) */
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+/* Anchor for the mega-menu — positioned right under the Sign Up CTA */
+.navbar__mega-anchor {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 0;
+  height: 0;
+}
+
+.navbar__link {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  transition: color var(--duration-fast) var(--ease-out);
+  padding: var(--space-2) 0;
+}
+
+.navbar__link:hover {
+  color: var(--color-primary);
+}
+
+/* Button-style nav links (scroll actions) — reset to match <a> links */
+.navbar__link--btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Sign Up CTA button */
+.navbar__link--cta {
+  background: var(--color-accent);
+  color: var(--color-text-on-accent) !important;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-full);
+  font-weight: var(--weight-semibold);
+}
+
+.navbar__link--cta:hover {
+  background: var(--color-accent-hover);
+  box-shadow: 0 0 16px rgba(191, 255, 0, 0.3);
+}
+
+/* ── Icon-only nav buttons (Favorites heart, Customer Care headset) ── */
+.navbar__icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out);
+}
+
+.navbar__icon-btn:hover {
+  color: var(--color-primary);
+  background: rgba(2, 44, 34, 0.06);
+}
+
+/* "You are here" wayfinding for icon-only nav items — the lime underline (::after) carries the
+   active state on its own; no background tint, so the hover tint stays the only fill and "active"
+   never reads as a permanently-hovered button. */
+.navbar__icon-btn--active {
+  color: var(--color-primary);
+  background: none;
+}
+
+.navbar__icon-btn--active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 25%;
+  right: 25%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-accent);
+}
+
+.navbar__badge {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: var(--weight-bold);
+  line-height: 18px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Badge variant attached to the Sign Up / Profile CTA pill. The CTA
+ * uses an accent background, so the badge inverts to primary (Midnight
+ * Emerald) for contrast and floats off the top-right corner. The CTA
+ * is not position:relative by default — make it so via :has() so the
+ * badge anchors correctly without touching the base CTA rule. */
+.navbar__link--cta:has(.navbar__badge--cta) {
+  position: relative;
+}
+
+.navbar__badge--cta {
+  top: -6px;
+  right: -6px;
+  background: var(--color-primary);
+  color: var(--color-accent);
+}
+
+/* ── Drawer badge (favorites count in mobile menu) ── */
+.drawer__badge {
+  margin-left: auto;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: var(--weight-bold);
+  line-height: 22px;
+  text-align: center;
+}
+
+/* ── Mobile Hamburger ── */
+/* Mobile-only right cluster (search + hamburger). Hidden on desktop; the two triggers live in
+   .navbar__links there. Grouping keeps them together on the right under the inner space-between. */
+.navbar__mobile-actions {
+  display: none;
+  align-items: center;
+  gap: var(--space-1, 4px);
+}
+
+/* Mobile-only search magnifier (desktop uses the button inside .navbar__links).
+   Hidden on desktop; revealed alongside the hamburger at the mobile breakpoint. */
+.navbar__mobile-search {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.navbar__hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+}
+
+.navbar__hamburger-line {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--color-primary);
+  border-radius: 2px;
+}
+
+/* ── Drawer Overlay ── */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-overlay);
+  animation: fadeIn var(--duration-fast) var(--ease-out);
+}
+
+/* ── Drawer Panel ── */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 85vw;
+  background: var(--color-bg-white);
+  z-index: var(--z-modal);
+  transform: translateX(100%);
+  transition: transform var(--duration-slow) var(--ease-out);
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer--open {
+  transform: translateX(0);
+}
+
+.drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.drawer__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.drawer__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  transition: background var(--duration-fast);
+}
+
+.drawer__close:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.drawer__nav {
+  flex: 1;
+  padding: var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.drawer__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  transition: background var(--duration-fast);
+}
+
+.drawer__link:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.drawer__footer {
+  padding: var(--space-5);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--color-text-tertiary);
+  font-size: var(--text-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* ── Help trigger (mega menu wrapper) ── */
+.navbar__help-wrap {
+  position: relative;
+}
+
+.navbar__help-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  transition: color var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out);
+}
+
+.navbar__help-trigger:hover,
+.navbar__help-trigger.is-open {
+  color: var(--color-primary);
+  background: rgba(2, 44, 34, 0.06);
+}
+
+/* Services icon — slightly larger button than other icon-btns to give the
+   accessibility glyph room to breathe. */
+.navbar__help-trigger {
+  width: 44px;
+  height: 44px;
+}
+
+.navbar__help-chevron {
+  transform: rotate(90deg);
+  transition: transform var(--duration-fast) var(--ease-out);
+  color: var(--color-text-tertiary);
+}
+
+.navbar__help-trigger.is-open .navbar__help-chevron {
+  transform: rotate(-90deg);
+  color: var(--color-primary);
+}
+
+/* ── Drawer collapsible group (mobile Help) ── */
+.drawer__link--group {
+  justify-content: flex-start;
+}
+
+.drawer__group-chevron {
+  margin-left: auto;
+  transition: transform var(--duration-fast) var(--ease-out);
+  color: var(--color-text-tertiary);
+}
+
+.drawer__link--group.is-open .drawer__group-chevron {
+  transform: rotate(90deg);
+  color: var(--color-primary);
+}
+
+.drawer__sublist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2) var(--space-2) var(--space-4);
+  margin-bottom: var(--space-1);
+  border-left: 2px solid rgba(2, 44, 34, 0.08);
+  margin-left: var(--space-4);
+}
+
+.drawer__sublink {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: none;
+  border: none;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--color-text);
+  text-decoration: none;
+  transition: background var(--duration-fast);
+}
+
+.drawer__sublink:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.drawer__sublink > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.drawer__sublink strong {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
+}
+
+.drawer__sublink em {
+  font-style: normal;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .navbar__links {
+    display: none;
+  }
+
+  .navbar__mobile-actions {
+    display: flex;
+  }
+
+  .navbar__mobile-search {
+    display: flex;
+  }
+
+  .navbar__hamburger {
+    display: flex;
+  }
+}

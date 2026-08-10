@@ -1,0 +1,430 @@
+/* ==========================================================================
+   STOREFRONT — the §8 buyer-facing shop page. PAGE-ONLY (no sheet/overlay
+   mount; the previous sheet variant broke the /trade layout — appeared above
+   the navbar and left the sidebar visible underneath). Mounted by ShopPage.
+   §8.4 catalogue tone (no social bling): calm surfaces, clear rating/follower
+   readouts, no like/save/share affordances on the storefront body itself.
+   ========================================================================== */
+
+.storefront {
+  color: var(--color-text-primary);
+  background: var(--color-bg-white, #fff);
+  /* Natural document flow, contained width. ShopPage owns the outer chrome
+     (back link, page centering); this component owns its own body padding. */
+  min-height: 60vh;
+  padding: var(--space-4) 0;
+}
+
+/* ── Identity header ──────────────────────────────────────────────────── */
+
+.storefront__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+/* Banner sits above the avatar/name. When no seller-published cover, we render a tinted band
+   colored by the shop's category (falls back to neutral) so the surface is never blank. */
+.storefront__banner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  background: var(--storefront-cat-color, var(--color-surface-alt, rgba(0, 0, 0, 0.06)));
+}
+
+.storefront__banner--empty {
+  /* A subtle gradient over the category color so the band reads as intentional, not "missing". */
+  background: linear-gradient(
+    135deg,
+    var(--storefront-cat-color, var(--color-surface-alt, rgba(0, 0, 0, 0.08))) 0%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+}
+
+.storefront__banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Avatar + name/meta sit below the banner. On desktop the avatar overlaps the banner's lower
+   edge; on narrow screens we keep them stacked so nothing crops. */
+.storefront__id {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-2);
+}
+
+.storefront__avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 3px solid var(--color-bg-white, #fff);
+  background: var(--color-surface-alt, rgba(0, 0, 0, 0.06));
+  margin-top: -32px;   /* overlap the banner */
+}
+
+.storefront__id-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.storefront__name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: var(--weight-semibold, 600);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.storefront__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.storefront__category {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill, 999px);
+  font-size: 0.72rem;
+  font-weight: var(--weight-semibold, 600);
+  color: var(--color-text-primary);
+  background: var(--storefront-cat-color, var(--color-surface-alt, rgba(0, 0, 0, 0.06)));
+}
+
+.storefront__rating,
+.storefront__followers {
+  white-space: nowrap;
+}
+
+/* Follow button — sits at the right edge of the identity row on wide layouts; wraps below on
+   narrow ones (flex-wrap on .storefront__id-text keeps this cheap). Two visual states: the
+   default "Follow" is filled (primary CTA); "Following" is outlined so a buyer sees the toggle
+   IS in the second state (avoiding the "did I follow?" ambiguity). */
+.storefront__follow {
+  align-self: center;
+  margin-left: auto;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill, 999px);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: var(--weight-semibold, 600);
+  cursor: pointer;
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text-inverse, #fff);
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.storefront__follow--following {
+  background: transparent;
+  color: var(--color-primary);
+}
+
+.storefront__follow:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.storefront__follow:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+/* ── Loading skeleton — mirrors the identity header dimensions so the layout doesn't jump when
+      the real content arrives. Muted grey blocks, no shimmer (§8.4 calm-catalogue tone). ── */
+
+.storefront__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.storefront__skeleton-banner {
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  border-radius: var(--radius-lg, 12px);
+  background: var(--color-surface-alt, rgba(0, 0, 0, 0.06));
+}
+
+.storefront__skeleton-id {
+  display: flex;
+  gap: var(--space-3);
+  padding: 0 var(--space-2);
+}
+
+.storefront__skeleton-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--color-surface-alt, rgba(0, 0, 0, 0.08));
+  margin-top: -32px;
+  border: 3px solid var(--color-bg-white, #fff);
+  flex-shrink: 0;
+}
+
+.storefront__skeleton-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.storefront__skeleton-line {
+  height: 12px;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-surface-alt, rgba(0, 0, 0, 0.06));
+  width: 60%;
+}
+
+.storefront__skeleton-line--name {
+  height: 18px;
+  width: 40%;
+}
+
+/* Empty / error state — soft; no icons of doom. The header just says "couldn't load". */
+.storefront__empty {
+  padding: var(--space-6, 32px) var(--space-4);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+/* ── Tab strip (Catalogue / Reviews) ──
+   Underline-style tabs — the ACTIVE tab carries a colored bottom border; the inactive one is
+   plain text. Kept minimal because §8.4 says shops are a catalogue, so we don't want the tabs
+   feeling like social-app affordances. */
+.storefront__tabs {
+  display: flex;
+  gap: var(--space-3);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin: var(--space-4) 0 var(--space-3);
+}
+
+.storefront__tab {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: var(--space-2) 0;
+  margin-bottom: -1px; /* overlap the strip's border so the active underline meets it cleanly */
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: var(--weight-semibold, 600);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.storefront__tab:hover:not(.storefront__tab--active) {
+  color: var(--color-text-primary);
+}
+
+.storefront__tab--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.storefront__tab:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.storefront__panel {
+  padding: var(--space-2) 0;
+}
+
+/* ── Catalogue grid — responsive, 2-up on narrow, up to 4-up on wide ── */
+.storefront__grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+@media (min-width: 640px) {
+  .storefront__grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 960px) {
+  .storefront__grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.storefront__card {
+  /* Card wrapper — the inner button/div carries the actual chrome. */
+}
+
+.storefront__card-btn {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-md, 10px);
+  background: var(--color-bg-white, #fff);
+  overflow: hidden;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  transition: box-shadow 120ms ease, transform 120ms ease;
+}
+
+.storefront__card-btn:not(.storefront__card-btn--static):hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.storefront__card-btn--static {
+  cursor: default;
+}
+
+.storefront__card-btn:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+.storefront__card-media {
+  aspect-ratio: 1 / 1;
+  background: var(--color-surface-alt, rgba(0, 0, 0, 0.04));
+  overflow: hidden;
+}
+
+.storefront__card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.storefront__card-media--empty {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.04) 0%,
+    rgba(0, 0, 0, 0.08) 100%
+  );
+}
+
+.storefront__card-text {
+  padding: var(--space-2) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.storefront__card-title {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  /* Two-line clamp so long titles don't blow up the card. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.storefront__card-price {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: var(--weight-semibold, 600);
+  color: var(--color-text-primary);
+}
+
+.storefront__card-bargain {
+  font-weight: var(--weight-regular, 400);
+  color: var(--color-text-secondary);
+}
+
+/* ── Reviews list ── */
+.storefront__reviews-loading {
+  padding: var(--space-4);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.storefront__reviews {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.storefront__review-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.storefront__review {
+  padding: var(--space-3);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-md, 10px);
+  background: var(--color-bg-white, #fff);
+}
+
+.storefront__review-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  margin-bottom: var(--space-1, 4px);
+}
+
+.storefront__review-stars {
+  color: var(--color-primary);
+  letter-spacing: 1px;
+  font-size: 0.95rem;
+}
+
+.storefront__review-date {
+  color: var(--color-text-tertiary, var(--color-text-secondary));
+  font-size: 0.78rem;
+}
+
+.storefront__review-body {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.storefront__load-more {
+  align-self: center;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  background: transparent;
+  border-radius: var(--radius-pill, 999px);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.storefront__load-more:disabled {
+  opacity: 0.55;
+  cursor: default;
+}

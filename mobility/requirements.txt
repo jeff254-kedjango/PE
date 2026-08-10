@@ -1,0 +1,18 @@
+# Mobility service — the realtime dispatch layer (PE/weespas_trade_architecture.md §5).
+#
+# Unlike commerce (sync request/response on psycopg2), mobility adopts the ASYNC stack from
+# day one (doc §4 locked): a blocking driver would pin worker threads during the realtime
+# dispatch read. This slice (the §5 dispatch spine) is Redis-only — GEO for live positions,
+# Pub/Sub for the SSE downlink — so no Postgres driver is pinned here yet. asyncpg +
+# GeoAlchemy2 land with the durable graph (KYC store, ride history), a later slice.
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+PyJWT==2.9.0             # RS256 VERIFY only — matches the audited commerce/InSAR verifier (not jose)
+cryptography==46.0.7     # RSA primitives behind PyJWT RS256
+redis==7.4.0            # GEO (live driver positions) + Pub/Sub (SSE dispatch bus); async client
+pytest==8.3.4
+pytest-asyncio==0.24.0  # async test support (the dispatch path is async end-to-end)
+httpx==0.27.2           # ASGI test client (async)
+anyio==3.7.1            # async test primitives (matches fastapi/starlette's pin)

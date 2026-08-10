@@ -1,0 +1,24 @@
+/* ShopAvatar — shared shop profile picture (image variant + initials fallback). The caller's
+   sizing class (e.g. .product-card__avatar) supplies width/height/font-size/border-radius; this
+   file owns only what's common to both variants. */
+
+.shop-avatar {
+  flex-shrink: 0;
+}
+
+/* Image variant: fill the caller's square box, crop to fill (no letterboxing), round via the
+   caller's border-radius. block removes the inline-image baseline gap. */
+.shop-avatar:not(.shop-avatar--initial) {
+  object-fit: cover;
+  display: block;
+}
+
+/* Initials variant: the gradient circle the app used before (centred letter on brand green).
+   Border-radius / size / font-size come from the caller's class. */
+.shop-avatar--initial {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: var(--color-text-inverse);
+  font-weight: var(--weight-bold);
+}

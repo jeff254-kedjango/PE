@@ -1,0 +1,121 @@
+/* ==========================================================================
+   RISK PILL — small coverage/tier badge. Tones are deliberately distinct so
+   'not monitored' and 'unavailable' can NEVER be misread as a green 'safe'
+   (analysis_three.md §1). Tier colours run cool→hot (stable→critical).
+   Pure CSS, no per-frame work; one inline-flex element.
+   ========================================================================== */
+
+.risk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+}
+
+.risk-pill__approx {
+  font-weight: var(--weight-semibold);
+  opacity: 0.7;
+}
+
+/* ── Monitored tiers (cool → hot) ───────────────────────────────────────── */
+.risk-pill--stable,
+.risk-pill--monitored {
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+  border-color: rgba(16, 185, 129, 0.30);
+}
+
+.risk-pill--low {
+  background: rgba(132, 204, 22, 0.14);
+  color: #4d7c0f;
+  border-color: rgba(132, 204, 22, 0.32);
+}
+
+.risk-pill--elevated {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.risk-pill--high {
+  background: rgba(249, 115, 22, 0.16);
+  color: #c2410c;
+  border-color: rgba(249, 115, 22, 0.38);
+}
+
+.risk-pill--critical {
+  background: rgba(239, 68, 68, 0.16);
+  color: #b91c1c;
+  border-color: rgba(239, 68, 68, 0.40);
+}
+
+/* ── Not monitored — NEUTRAL slate, intentionally NOT green ─────────────── */
+.risk-pill--unmonitored {
+  background: rgba(100, 116, 139, 0.12);
+  color: #475569;
+  border-color: rgba(100, 116, 139, 0.28);
+}
+
+/* ── Unavailable / error — muted, "we can't say" ───────────────────────── */
+.risk-pill--unavailable {
+  background: rgba(148, 163, 184, 0.10);
+  color: #64748b;
+  border-color: rgba(148, 163, 184, 0.24);
+}
+
+/* ── Pending — verification in progress; calm informative blue (NOT green, NOT
+      gray-as-error). Distinct from the transient loading placeholder. ───────── */
+.risk-pill--pending {
+  background: rgba(59, 130, 246, 0.12);
+  color: #1d4ed8;
+  border-color: rgba(59, 130, 246, 0.28);
+}
+
+/* ── Provisional (needs_confirmation) — keeps the worst-case tier COLOUR (via the
+      risk-pill--{tone} class) so it never reads safer than reality, but a dashed border
+      signals "not final, confirm the building". ───────────────────────────── */
+.risk-pill--provisional {
+  border-style: dashed;
+  border-width: 1.5px;
+}
+
+/* ── Land — open parcel; ground estimated from neighbours. Earthy slate-teal,
+      deliberately NOT a per-building tier colour. ──────────────────────────── */
+.risk-pill--land {
+  background: rgba(20, 184, 166, 0.12);
+  color: #0f766e;
+  border-color: rgba(20, 184, 166, 0.28);
+}
+
+/* ── Loading placeholder with a soft pulsing dot ───────────────────────── */
+.risk-pill--loading {
+  background: rgba(148, 163, 184, 0.10);
+  color: #94a3b8;
+  border-color: rgba(148, 163, 184, 0.20);
+}
+
+.risk-pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: risk-pill-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes risk-pill-pulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .risk-pill__dot { animation: none; opacity: 0.6; }
+}

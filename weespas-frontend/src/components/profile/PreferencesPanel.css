@@ -1,0 +1,382 @@
+/* ==========================================================================
+   PREFERENCES PANEL — lazy-loaded shell that hosts Phase 1+ profile prefs.
+   Performance notes:
+   - No JS-driven animation. The slide-in is a pure `transform`+`opacity`
+     keyframe so it stays on the compositor thread (no main-thread paint).
+   - The toggle is a native <input type="checkbox"> with a CSS-only switch
+     visual — zero JS, zero state libs, fully accessible to screen readers
+     and keyboard nav.
+   ========================================================================== */
+
+.prefs-panel {
+  width: 100%;
+  max-width: 480px;
+  background: var(--color-bg-white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-lg);
+  animation: prefsFadeIn 200ms ease-out;
+}
+
+@keyframes prefsFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.prefs-panel__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.prefs-panel__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+}
+.prefs-panel__back:hover { background: var(--color-bg-subtle); color: var(--color-text); }
+
+.prefs-panel__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.prefs-section { margin-bottom: var(--space-6); }
+.prefs-section:last-child { margin-bottom: 0; }
+
+.prefs-section__title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 var(--space-3);
+}
+
+/* ── Toggle row ───────────────────────────────────────────────────────────
+   Native checkbox is visually hidden but kept in the accessibility tree;
+   the `+ .prefs-toggle__switch` pseudo-element renders the visual switch
+   driven entirely by `:checked` / `:focus-visible` selectors. */
+.prefs-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.prefs-toggle:hover { border-color: var(--color-primary); background: var(--color-bg-subtle); }
+
+.prefs-toggle__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.prefs-toggle__label {
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+}
+.prefs-toggle__hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.prefs-toggle__input {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.prefs-toggle__switch {
+  flex-shrink: 0;
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: var(--color-border);
+  border-radius: 999px;
+  transition: background 160ms ease;
+}
+.prefs-toggle__switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: transform 160ms ease;
+}
+.prefs-toggle__input:checked + .prefs-toggle__switch { background: var(--color-primary); }
+.prefs-toggle__input:checked + .prefs-toggle__switch::after { transform: translateX(18px); }
+.prefs-toggle__input:focus-visible + .prefs-toggle__switch {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+.prefs-toggle__input:disabled + .prefs-toggle__switch { opacity: 0.6; cursor: not-allowed; }
+
+.prefs-error {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+  color: var(--color-danger, #c53030);
+}
+
+/* ─── New section primitives (Phases 4, 5, 6, 8) ────────────────────── */
+.prefs-section__count {
+  color: var(--color-muted, #777);
+  font-weight: 400;
+}
+
+.prefs-toggle__badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: var(--color-warn-soft, #fff4d6);
+  color: var(--color-warn, #8a6a00);
+  font-size: 0.7rem;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.prefs-empty {
+  margin: 8px 0 0;
+  font-size: var(--text-sm, 0.9rem);
+  color: var(--color-muted, #777);
+}
+
+/* Field + chip rows (used by Search defaults) */
+.prefs-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.prefs-field:last-child { margin-bottom: 0; }
+
+.prefs-field__label {
+  font-size: 0.85rem;
+  color: var(--color-muted, #555);
+}
+
+.prefs-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.prefs-chip {
+  padding: 6px 12px;
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text, #222);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.prefs-chip:hover:not(:disabled) {
+  background: var(--color-surface-alt, #f3f4f6);
+}
+.prefs-chip--on {
+  background: var(--color-primary, #2d7ff9);
+  color: #fff;
+  border-color: var(--color-primary, #2d7ff9);
+}
+.prefs-chip:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Hidden listings */
+.prefs-hidden-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.prefs-hidden-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--color-surface-alt, #f7f8fa);
+}
+
+.prefs-hidden-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.prefs-hidden-thumb--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-border, #e5e7eb);
+  color: var(--color-muted, #888);
+}
+
+.prefs-hidden-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.prefs-hidden-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text, #222);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prefs-hidden-sub {
+  font-size: 0.78rem;
+  color: var(--color-muted, #666);
+}
+
+/* Sessions */
+.prefs-sessions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.prefs-session {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, #eee);
+  background: var(--color-surface, #fff);
+}
+
+.prefs-session--current {
+  border-color: var(--color-primary, #2d7ff9);
+  background: var(--color-primary-soft, rgba(45, 127, 249, 0.06));
+}
+
+.prefs-session__main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.prefs-session__device {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text, #222);
+}
+
+.prefs-session__current {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 0.7rem;
+  color: var(--color-primary, #2d7ff9);
+  font-weight: 600;
+}
+
+.prefs-session__meta {
+  font-size: 0.78rem;
+  color: var(--color-muted, #666);
+}
+
+/* Buttons */
+.prefs-link-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-primary, #2d7ff9);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+.prefs-link-btn:hover { background: var(--color-surface-alt, #f3f4f6); }
+
+.prefs-secondary-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, #ddd);
+  background: var(--color-surface, #fff);
+  color: var(--color-text, #222);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.prefs-secondary-btn:hover:not(:disabled) {
+  background: var(--color-surface-alt, #f3f4f6);
+}
+.prefs-secondary-btn--danger {
+  color: var(--color-danger, #c0392b);
+  border-color: var(--color-danger, #c0392b);
+}
+.prefs-secondary-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.prefs-confirm {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--color-muted, #555);
+}
+
+/* Saved searches (Phase 3) */
+.prefs-saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.prefs-saved-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--color-surface-alt, #f7f8fa);
+}
+
+.prefs-saved-apply {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: var(--color-text, #222);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  text-align: left;
+}
+.prefs-saved-apply:hover { background: var(--color-surface, #fff); }

@@ -1,0 +1,112 @@
+/* ==========================================================================
+   ROUTE ERROR BOUNDARY
+   ========================================================================== */
+
+.route-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: var(--space-6);
+}
+
+.route-error__card {
+  text-align: center;
+  max-width: 420px;
+  padding: var(--space-8);
+  border-radius: var(--radius-xl);
+  background: var(--color-bg-white);
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn var(--duration-normal) var(--ease-out);
+}
+
+.route-error__icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--space-4);
+  border-radius: var(--radius-full);
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  font-size: 28px;
+  font-weight: var(--weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.route-error__card h2 {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.route-error__card p {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+  line-height: 1.5;
+}
+
+.route-error__actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+}
+
+.route-error__retry {
+  padding: var(--space-2) var(--space-5);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: white;
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.route-error__retry:hover {
+  background: var(--color-primary-dark);
+}
+
+.route-error__home {
+  padding: var(--space-2) var(--space-5);
+  border: 1.5px solid rgba(2, 44, 34, 0.15);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.route-error__home:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ── Route Loading Spinner ── */
+.route-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  animation: fadeIn var(--duration-normal) var(--ease-out);
+}
+
+.route-loading__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(2, 44, 34, 0.1);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

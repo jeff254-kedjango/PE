@@ -1,0 +1,79 @@
+/* ==========================================================================
+   SELLER CONSOLE PAGE — the seller's dashboard surface (traditional, not social).
+   ========================================================================== */
+
+.seller-console {
+  max-width: 1200px;         /* widened for the §8 Chunk B two-column layout; the old 880px was
+                                sized for a single column and squeezed the new LEFT column below
+                                the width where the rank number and radius slider can breathe. */
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-10);
+}
+
+/* ── Two-column layout (§8 Chunk B) ────────────────────────────────────────
+   LEFT: 320px fixed — wide enough for the Ranking Card's rank number and its radius slider.
+   RIGHT: 1fr — the existing inventory dashboard flexes into whatever remains.
+   Below the medium breakpoint the columns stack vertically; the LEFT column comes FIRST
+   in DOM order so on mobile the intelligence cards appear above the inventory (the whole
+   point of the redesign — a seller opens /trade/sell to check their signals). */
+.seller-console__columns {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: var(--space-6);
+  align-items: start;
+  margin-bottom: var(--space-6);
+}
+
+@media (max-width: 900px) {
+  .seller-console__columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.seller-console__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;              /* let the RIGHT column's dashboard shrink without overflowing */
+}
+
+.seller-console__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.seller-console__header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.seller-console .eyebrow {
+  margin: 0 0 2px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.seller-console__state {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: var(--space-6) 0;
+}
+
+.seller-console__state--error { color: var(--color-danger, #b3261e); }
+
+.seller-console--gate {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-10) var(--space-5);
+}
+

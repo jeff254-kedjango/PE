@@ -1,0 +1,120 @@
+/* ==========================================================================
+   TRADE MEDIA UPLOADER — listing photo grid + optional short-video picker.
+   ========================================================================== */
+
+.trade-uploader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.trade-uploader__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.trade-uploader__label {
+  font-size: 0.85rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.trade-uploader__label em {
+  font-style: normal;
+  font-weight: var(--weight-regular, 400);
+  color: var(--color-text-secondary);
+}
+
+.trade-uploader__hint {
+  margin: 0.15rem 0 0.4rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+}
+
+.trade-uploader__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: var(--space-2);
+}
+
+.trade-uploader__thumb {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+  border: 1px solid rgba(2, 44, 34, 0.1);
+}
+
+.trade-uploader__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.trade-uploader__remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: var(--radius-full, 999px);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.trade-uploader__remove--video {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill, 999px);
+  font-size: 0.78rem;
+  font-weight: var(--weight-semibold);
+}
+
+.trade-uploader__add {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+  min-height: 84px;
+  border: 1px dashed rgba(2, 44, 34, 0.3);
+  border-radius: var(--radius-md, 8px);
+  background: rgba(2, 44, 34, 0.02);
+  color: var(--color-primary);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.trade-uploader__add:hover:not(:disabled) {
+  background: rgba(2, 44, 34, 0.06);
+}
+
+.trade-uploader__add:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.trade-uploader__video {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.trade-uploader__video video {
+  width: 100%;
+  max-width: 320px;
+  border-radius: var(--radius-md, 8px);
+  background: #000;
+}

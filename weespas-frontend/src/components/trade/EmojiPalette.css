@@ -1,0 +1,62 @@
+/* Emoji mini-palette — a small popover grid anchored by its relatively-positioned trigger wrapper. */
+.emoji-palette {
+  position: absolute;
+  z-index: var(--z-popover, 1100);
+  /* Open DOWNWARD (below the trigger), away from the sticky navbar at the top of the viewport —
+     opening upward made the tall 80-emoji grid run behind the navbar near the top of the page. */
+  top: calc(100% + 6px);
+  left: 0;
+  display: grid;
+  /* minmax(0, 1fr) — NOT a bare `1fr`. A bare `1fr` is `minmax(auto, 1fr)`, whose `auto` floor lets
+     a column grow to its widest emoji's content width (😂 is wider than ❤️), giving uneven columns;
+     under the fixed width + `overflow-x: hidden` that squeezes/clips the trailing column. The 0 floor
+     forces eight EQUAL columns and lets each glyph centre within its cell instead of stretching it. */
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 2px;
+  width: 296px;
+  max-width: min(296px, 90vw);
+  /* With 80 emoji the grid is ~10 rows tall; cap the height and scroll on the Y-axis only so it
+     always fits the viewport. overflow-x is pinned hidden: setting only overflow-y would let the
+     browser compute overflow-x to `auto`, showing an unwanted horizontal scrollbar. */
+  max-height: min(240px, 40vh);
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Reserve the vertical scrollbar's gutter inside the box so it doesn't eat into the 8-column track
+     width (which would pinch/clip the rightmost column once the grid scrolls). */
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain; /* a scroll at the palette's edge doesn't bleed to the page */
+  padding: var(--space-2);
+  background: var(--color-surface, #fff);
+  border: 1px solid rgba(2, 44, 34, 0.12);
+  border-radius: var(--radius-md, 10px);
+  box-shadow: var(--shadow-lg, 0 12px 32px rgba(2, 44, 34, 0.2));
+}
+
+/* Portaled variant: rendered at <body> with fixed positioning supplied inline (top/left computed
+   from the trigger). This escapes any ancestor `overflow: hidden` (e.g. .product-card) and every
+   ancestor stacking context — so the palette is never clipped inside the post card nor hidden by
+   the navbar. The bottom/left from the base rule no longer apply (position is now fixed). */
+.emoji-palette--fixed {
+  position: fixed;
+  bottom: auto;
+  z-index: var(--z-modal, 1200);
+}
+
+.emoji-palette__item {
+  appearance: none;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm, 6px);
+  padding: 4px;
+  min-width: 0; /* allow the button to shrink to its equal grid track instead of forcing it wider */
+  font-size: 1.2rem;
+  line-height: 1;
+  text-align: center; /* centre the glyph within its equal cell */
+  cursor: pointer;
+}
+
+.emoji-palette__item:hover,
+.emoji-palette__item:focus-visible {
+  background: rgba(2, 44, 34, 0.08);
+  outline: none;
+}

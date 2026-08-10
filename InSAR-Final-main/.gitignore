@@ -1,0 +1,40 @@
+# --- Python ---
+backend/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+
+# --- Frontend ---
+frontend/node_modules/
+frontend/public/tiles/*.pmtiles
+frontend/scripts/.bin/
+
+# --- Large InSAR / geospatial data (never commit; GitHub rejects >100MB) ---
+backend/data/demo.duckdb
+backend/data/parquet/
+backend/data/hyp3_work/
+backend/data/hyp3_work_4326/
+backend/data/hyp3_work_clipped/
+backend/data/raw/
+backend/data/mintpy/
+backend/data/footprints/
+backend/data/logs/
+backend/geospatial_data/
+backend/raw_radar_data/
+*.duckdb
+*.pmtiles
+*.tif
+*.tiff
+*.h5
+*.nc
+
+# --- Logs / scratch ---
+*.log
+backend/data/api_server.out
+
+# --- OS ---
+.DS_Store
+
+# Runtime structural-flag export (regenerated from Weespas Postgres by the exporter)
+backend/data/structural_flags/

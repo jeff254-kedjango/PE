@@ -1,0 +1,244 @@
+/* ==========================================================================
+   IMAGE GALLERY / LIGHTBOX
+   Fullscreen overlay with Stories progress bar, swipe, thumbnails.
+   ========================================================================== */
+
+/* ---------- Overlay (fills viewport) ---------- */
+.ig-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-lightbox, 600);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn var(--duration-normal, 250ms) var(--ease-out);
+}
+
+/* Dark backdrop */
+.ig-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  cursor: pointer;
+}
+
+/* ---------- Close button ---------- */
+.ig-close {
+  position: absolute;
+  top: var(--space-4, 16px);
+  right: var(--space-4, 16px);
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--duration-fast, 150ms) var(--ease-out);
+}
+
+.ig-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------- Counter badge ---------- */
+.ig-counter {
+  position: absolute;
+  top: var(--space-4, 16px);
+  left: var(--space-4, 16px);
+  z-index: 10;
+  padding: var(--space-1, 4px) var(--space-3, 12px);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full, 9999px);
+  color: #fff;
+  font-family: var(--font-body, 'Nunito', sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--weight-semibold, 600);
+}
+
+/* ---------- Stories progress bar ---------- */
+.ig-progress {
+  position: absolute;
+  top: calc(var(--space-4, 16px) + 48px);
+  left: var(--space-6, 24px);
+  right: var(--space-6, 24px);
+  z-index: 10;
+  display: flex;
+  gap: var(--space-1, 4px);
+}
+
+.ig-progress__bar {
+  flex: 1;
+  height: 3px;
+  border: none;
+  padding: 0;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  overflow: hidden;
+  transition: background var(--duration-fast, 150ms);
+}
+
+.ig-progress__bar--done {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.ig-progress__bar--active {
+  background: var(--color-accent, #BFFF00);
+}
+
+/* ---------- Image track ---------- */
+.ig-track-wrapper {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  /* Leave space for thumbnails at bottom */
+  padding-bottom: 80px;
+  padding-top: 80px;
+}
+
+.ig-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform var(--duration-slow, 400ms) var(--ease-out);
+  will-change: transform;
+}
+
+.ig-slide {
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4, 16px);
+}
+
+.ig-slide img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-md, 10px);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ---------- Arrow buttons (hidden on mobile) ---------- */
+.ig-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--duration-fast, 150ms) var(--ease-out);
+}
+
+.ig-arrow:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.ig-arrow--prev {
+  left: var(--space-4, 16px);
+}
+
+.ig-arrow--next {
+  right: var(--space-4, 16px);
+}
+
+@media (max-width: 767px) {
+  .ig-arrow {
+    display: none;
+  }
+}
+
+/* ---------- Thumbnail strip ---------- */
+.ig-thumbs {
+  position: absolute;
+  bottom: var(--space-4, 16px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  padding: 0 var(--space-4, 16px);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.ig-thumbs::-webkit-scrollbar {
+  display: none;
+}
+
+.ig-thumb {
+  flex-shrink: 0;
+  width: 56px;
+  height: 42px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm, 6px);
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  background: none;
+}
+
+.ig-thumb:hover {
+  opacity: 0.8;
+}
+
+.ig-thumb--active {
+  opacity: 1;
+  border-color: var(--color-accent, #BFFF00);
+}
+
+.ig-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ---------- Mobile adjustments ---------- */
+@media (max-width: 767px) {
+  .ig-progress {
+    top: var(--space-4, 16px);
+    left: var(--space-4, 16px);
+    right: var(--space-4, 16px);
+  }
+
+  .ig-counter {
+    top: calc(var(--space-4, 16px) + 24px);
+  }
+
+  .ig-track-wrapper {
+    padding-top: 56px;
+    padding-bottom: 72px;
+  }
+
+  .ig-thumb {
+    width: 48px;
+    height: 36px;
+  }
+}

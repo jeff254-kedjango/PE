@@ -1,0 +1,87 @@
+/* ==========================================================================
+   SHOP VIDEO STRIP — §8 Trade short-video shelf.
+
+   This file no longer defines a bespoke shelf — ShopVideoStrip REUSES the
+   weespas <ShortsShelf>. All it does is tune that shelf for the narrow right
+   rail: show two 9:16 tiles at once, and strip the card chrome (no border /
+   box-shadow / padding) so the videos sit bare in the column, per design.
+   The chevron nav, sizing formula, scroll machinery and bottom-right placement
+   all come from ShortsShelf.css unchanged.
+   ========================================================================== */
+
+.shorts-shelf.shop-video-strip {
+  /* Two tiles fill the rail width at once (ShortsShelf's slot formula reads this var). Three was
+     too cramped for this narrow right column — each 9:16 tile became a thin sliver and its
+     title/price overlay wrapped awkwardly. Two gives each card enough width to read cleanly. */
+  --shorts-visible-count: 2;
+  /* No card: the row sits flush in the rail with just a little breathing room above. */
+  margin: 0;
+}
+
+/* Tile overlay type is INTENTIONALLY left at ShortCard's shared --text-sm (14px). An earlier
+   variant scaled it up to fill the two wider tiles, but that pushed it to 16px — LARGER than the
+   adjacent feed's own title (15.2px) and its shop-name/description (~14px), inverting the hierarchy
+   (a peripheral discovery rail must not shout louder than the primary feed beside it). Falling back
+   to --text-sm matches the feed's secondary text exactly and keeps rail ≤ feed. No override here. */
+
+/* Tighten the bottom padding the shelf track reserves — the rail is compact. */
+.shorts-shelf.shop-video-strip .shorts-shelf__track {
+  padding-bottom: var(--space-1, 4px);
+}
+
+/* Nav row sits snug under the tiles in the rail (the shelf default adds more top margin for the
+   full-width grid context). */
+.shorts-shelf.shop-video-strip .shorts-shelf__nav {
+  margin-top: var(--space-2);
+}
+
+/* ── Chunk 1 (permanent columns): empty-state visuals ─────────────────────
+   When there are no clips nearby the strip renders TWO 9:16 skeleton tiles + an honest
+   placeholder message instead of unmounting, so the right column keeps its width and vertical
+   rhythm on load. Uses the shared `.skeleton` shimmer from styles/animations.css.
+   ---------------------------------------------------------------------- */
+.shop-video-strip--empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.shop-video-strip__tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+}
+
+.shop-video-strip__tile-skeleton {
+  /* Match the 9:16 aspect of a real short tile so the two states never differ in height. */
+  aspect-ratio: 9 / 16;
+  width: 100%;
+  border-radius: var(--radius-md, 10px);
+}
+
+.shop-video-strip__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  padding: var(--space-2) var(--space-3);
+  text-align: center;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.shop-video-strip__placeholder-icon {
+  color: var(--color-text-secondary, #9ca3af);
+  opacity: 0.55;
+}
+
+.shop-video-strip__placeholder-title {
+  font-size: 0.82rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary, #111827);
+}
+
+.shop-video-strip__placeholder-sub {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--color-text-secondary, #6b7280);
+}

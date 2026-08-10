@@ -1,0 +1,112 @@
+/* ==========================================================================
+   MEGA MENU — Desktop only. Hidden under 768px (mobile uses drawer).
+   Anchored to the right edge of .navbar__links (i.e. under the Sign Up CTA),
+   extends horizontally to the left. min-height 50vh.
+   ========================================================================== */
+
+.mega-menu {
+  position: absolute;
+  top: 8px;            /* sits 8px below the navbar (parent anchor is at top: 100%) */
+  right: 0;
+  left: auto;
+  transform: translateY(-6px);
+  width: min(960px, calc(100vw - 32px));
+  min-height: 50vh;
+  background: var(--color-bg-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg, 0 16px 40px rgba(2, 44, 34, 0.18));
+  border: 1px solid rgba(2, 44, 34, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+  z-index: var(--z-overlay, 90);
+  overflow: hidden;
+}
+
+.mega-menu--open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.mega-menu__inner {
+  display: grid;
+  /* auto-fit so the panel holds the original 3 service columns AND the added Risk Map / Trade
+     entries (4–5 total) — they flow onto a second row instead of clipping. */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-6);
+  height: 100%;
+  min-height: 50vh;
+  align-content: start;
+}
+
+.mega-menu__col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-5);
+  border-radius: var(--radius-md);
+  background: rgba(2, 44, 34, 0.025);
+  border: 1px solid rgba(2, 44, 34, 0.06);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.mega-menu__col:hover,
+.mega-menu__col:focus-visible {
+  background: rgba(2, 44, 34, 0.06);
+  border-color: rgba(2, 44, 34, 0.14);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.mega-menu__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.mega-menu__col:hover .mega-menu__icon,
+.mega-menu__col:focus-visible .mega-menu__icon {
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+}
+
+.mega-menu__heading {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-primary);
+  letter-spacing: -0.01em;
+  margin-top: var(--space-2);
+}
+
+.mega-menu__copy {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+@media (max-width: 768px) {
+  .mega-menu {
+    display: none;
+  }
+}

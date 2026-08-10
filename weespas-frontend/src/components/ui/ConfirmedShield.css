@@ -1,0 +1,8 @@
+/* ConfirmedShield — small green shield icon (ground-verified provenance) */
+
+.confirmed-shield {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-success);
+  flex-shrink: 0;
+}

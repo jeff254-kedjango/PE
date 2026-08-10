@@ -1,0 +1,244 @@
+/* EditProfilePanel — visual shell for Phase 2/7/9.
+ *
+ * Performance notes:
+ * - No JS-driven animation: the panel slide-in is a single transform
+ *   keyframe that stays on the compositor thread.
+ * - All buttons are native <button>, all inputs are native <input> /
+ *   <textarea> — zero component-library overhead, zero reflow churn
+ *   beyond the keystroke itself.
+ * - The avatar block uses `object-fit: cover` instead of a JS crop so
+ *   the browser can lay it out on the GPU and decode the image off the
+ *   main thread.
+ */
+.edit-profile-panel {
+  background: var(--surface, #fff);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 640px;
+  margin: 24px auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  animation: edit-panel-in 180ms ease-out;
+}
+
+@keyframes edit-panel-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.edit-profile-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border, #eee);
+}
+
+.edit-profile-panel__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #555);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.edit-profile-panel__back:hover {
+  background: var(--surface-alt, #f5f5f5);
+}
+
+.edit-profile-panel__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.edit-profile-panel__loading {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--text-muted, #777);
+}
+
+.edit-section {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border, #f0f0f0);
+}
+
+.edit-section:last-child {
+  border-bottom: none;
+}
+
+.edit-section--danger .edit-section__title {
+  color: var(--danger, #c0392b);
+}
+
+.edit-section__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--text, #222);
+}
+
+.edit-section__hint {
+  font-size: 0.85rem;
+  color: var(--text-muted, #666);
+  margin: 0 0 12px;
+}
+
+.edit-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.edit-row--read {
+  justify-content: space-between;
+}
+
+.edit-readonly {
+  color: var(--text-muted, #555);
+  font-size: 0.9rem;
+}
+
+.edit-subform {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.edit-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border, #ddd);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--surface, #fff);
+  color: var(--text, #222);
+  transition: border-color 120ms ease;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: var(--accent, #2d7ff9);
+}
+
+.edit-input--textarea {
+  min-height: 80px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-alt, #f3f4f6);
+  border: 1px solid var(--border, #e5e7eb);
+  color: var(--text, #222);
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.edit-btn:hover:not(:disabled) {
+  background: var(--surface-hover, #e5e7eb);
+}
+
+.edit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.edit-btn--primary {
+  background: var(--accent, #2d7ff9);
+  border-color: var(--accent, #2d7ff9);
+  color: #fff;
+}
+
+.edit-btn--primary:hover:not(:disabled) {
+  background: var(--accent-hover, #1f6de0);
+}
+
+.edit-btn--danger {
+  background: var(--danger, #c0392b);
+  border-color: var(--danger, #c0392b);
+  color: #fff;
+}
+
+.edit-btn--danger:hover:not(:disabled) {
+  background: var(--danger-hover, #a83224);
+}
+
+/* Avatar */
+.edit-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.edit-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--accent-soft, #e3eefe);
+  color: var(--accent, #2d7ff9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-weight: 600;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.edit-avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.edit-avatar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.edit-msg {
+  font-size: 0.85rem;
+  margin: 4px 0 0;
+}
+
+.edit-msg--error { color: var(--danger, #c0392b); }
+.edit-msg--ok    { color: var(--success, #1f8a4c); }
+
+/* ── Bio editor ─────────────────────────────────────────────────────
+   Layout-only additions; visuals inherit from .edit-input and
+   .edit-input--textarea above. */
+.edit-bio__textarea {
+  width: 100%;
+  min-height: 110px;
+  line-height: 1.45;
+}
+
+.edit-bio__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.edit-bio__count {
+  font-size: 0.8rem;
+  color: var(--text-muted, #6b7280);
+  font-variant-numeric: tabular-nums; /* keeps the counter width stable */
+}

@@ -1,0 +1,18 @@
+/* PriceDisplay — glassmorphism floating price tag */
+
+.price-display {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: #fff;
+  background: var(--glass-bg-dark);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}

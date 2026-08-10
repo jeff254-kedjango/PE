@@ -1,0 +1,193 @@
+/* ==========================================================================
+   COMMENT THREAD — the public comment thread under a social-feed post (§8).
+   ========================================================================== */
+
+.comment-thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border-top: 1px solid rgba(2, 44, 34, 0.07);
+  background: rgba(2, 44, 34, 0.015);
+}
+
+.comment-thread__composer {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* Relative so the emoji palette anchors to the input, and houses the inline emoji trigger. */
+.comment-thread__input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.comment-thread__input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-2) calc(var(--space-3) + 28px) var(--space-2) var(--space-3);
+  border: 1px solid rgba(2, 44, 34, 0.14);
+  border-radius: var(--radius-pill, 999px);
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
+  background: var(--color-bg-white);
+}
+
+.comment-thread__emoji-btn {
+  position: absolute;
+  right: 6px;
+  appearance: none;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 2px;
+  cursor: pointer;
+}
+
+.comment-thread__emoji-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Per-comment like ("love") — a small heart + count under the body. */
+.comment-thread__like {
+  align-self: flex-start;
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-family: inherit;
+  font-size: 0.74rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  /* Smooth fade to red on like, matching the property FavoriteButton's feel. */
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+/* Use the canonical --color-heart (#EF4444), NOT the undefined --color-danger token (which fell
+   back to a one-off #c0392b crimson) — every heart in the app reads the same red when active. */
+.comment-thread__like--on {
+  color: var(--color-heart);
+}
+
+.comment-thread__like:disabled {
+  cursor: default;
+}
+
+.comment-thread__like-count {
+  font-weight: var(--weight-semibold);
+}
+
+.comment-thread__input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary-light);
+}
+
+.comment-thread__send {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-family: inherit;
+  font-weight: var(--weight-semibold);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.comment-thread__send:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.comment-thread__state,
+.comment-thread__error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+}
+
+.comment-thread__error {
+  color: var(--color-danger, #c0392b);
+}
+
+.comment-thread__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.comment-thread__item {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.comment-thread__avatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full, 999px);
+  background: var(--color-primary-light, #2f6b57);
+  color: var(--color-text-inverse);
+  font-size: 0.75rem;
+  font-weight: var(--weight-bold);
+}
+
+.comment-thread__bubble {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-bg-white);
+  border: 1px solid rgba(2, 44, 34, 0.08);
+  min-width: 0;
+}
+
+.comment-thread__author {
+  font-size: 0.72rem;
+  font-weight: var(--weight-bold);
+  color: var(--color-text-secondary);
+}
+
+.comment-thread__body {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.comment-thread__more {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.comment-thread__more:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

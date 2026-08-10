@@ -1,0 +1,175 @@
+/* ==========================================================================
+   SHORTS SHELF — horizontal YouTube-style row interleaved into the property grid.
+   ========================================================================== */
+
+.shorts-shelf {
+  margin: var(--space-6) 0;
+}
+
+.shorts-shelf__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.shorts-shelf__header h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+}
+
+.shorts-shelf__see-all {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: transparent;
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.shorts-shelf__see-all:hover {
+  background: rgba(2, 44, 34, 0.06);
+}
+
+/* Viewport wraps just the track now — nav lives below as a sibling. Kept as
+   a wrapper rather than dropping it because the ResizeObserver in JS still
+   targets the track, and the wrapper protects future styling hooks. */
+.shorts-shelf__viewport {
+  position: relative;
+}
+
+.shorts-shelf__track {
+  display: flex;
+  gap: var(--short-card-gap);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: var(--space-2);
+  /* No visible scrollbar — navigation is via arrow buttons. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Each direct child of the track is one card slot. Width is computed so that
+   exactly `--shorts-visible-count` cards fill 100% of the viewport width,
+   with the gaps between them subtracted from the available space. */
+.shorts-shelf__track > * {
+  scroll-snap-align: start;
+  flex: 0 0 calc(
+    (100% - (var(--shorts-visible-count) - 1) * var(--short-card-gap))
+    / var(--shorts-visible-count)
+  );
+  min-width: 0;
+}
+
+.shorts-shelf__track::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Nav controls — in-flow row centered BELOW the shelf track. Sitting below
+   the cards rather than overlaying them means no card content (price tag,
+   agent badge, dismiss button) is ever obscured. Touch viewports hide this
+   row entirely (see media query below) — swipe is the canonical gesture. */
+.shorts-shelf__nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: var(--space-3);
+}
+
+.shorts-shelf__nav-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(2, 44, 34, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-text);
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(6px);
+}
+
+.shorts-shelf__nav-btn:hover:not(:disabled) {
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.shorts-shelf__nav-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.shorts-shelf__nav-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Whole row collapses when scrolling is impossible (e.g. very few cards) so
+   we don't reserve dead vertical space below the shelf. aria-hidden flips
+   both flags simultaneously from JS — single source of truth. */
+.shorts-shelf__nav[aria-hidden="true"] {
+  display: none;
+}
+
+.shorts-shelf__skeleton {
+  aspect-ratio: 9 / 16;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, rgba(2,44,34,0.06), rgba(2,44,34,0.12), rgba(2,44,34,0.06));
+  background-size: 200% 100%;
+  animation: shorts-shelf-shimmer 1.4s linear infinite;
+}
+
+@keyframes shorts-shelf-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Responsive: drop the visible-count as the viewport narrows so cards
+   stay legible rather than being squeezed into thin strips. */
+@media (max-width: 1024px) {
+  .shorts-shelf { --shorts-visible-count: 4; }
+}
+@media (max-width: 768px) {
+  .shorts-shelf { --shorts-visible-count: 3; }
+}
+@media (max-width: 480px) {
+  .shorts-shelf { --shorts-visible-count: 2; }
+  .shorts-shelf__header h3 {
+    font-size: var(--text-base);
+  }
+  .shorts-shelf__nav-btn {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Hide nav buttons on coarse-pointer devices — touch users swipe directly. */
+@media (hover: none) and (pointer: coarse) {
+  .shorts-shelf__nav {
+    display: none;
+  }
+}

@@ -1,0 +1,208 @@
+/* ==========================================================================
+   SHORT CARD — 9:16 poster tile used inside the horizontal Shorts shelf.
+   ========================================================================== */
+
+.short-card {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-surface, #fff);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.short-card:hover,
+.short-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  outline: none;
+}
+
+.short-card__poster {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  background: rgba(2, 44, 34, 0.08);
+  overflow: hidden;
+}
+
+.short-card__poster img,
+.short-card__video-still {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.short-card__poster-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  color: var(--color-text-secondary);
+}
+
+/* Centered glass-disc that hosts the play icon. Sits above the poster but
+   below the dismiss button (z-index by source order). We render the disc at
+   rest with no background — only the icon shows — and reveal the circular
+   glass surround on card hover/focus. This gives the user an affordance
+   without competing with the poster art in the resting state. */
+.short-card__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid transparent;
+  /* will-change keeps the disc on its own compositor layer so the hover
+     transition doesn't repaint the underlying poster bitmap. */
+  will-change: transform, background, border-color, box-shadow;
+  transform: translate(-50%, -50%) scale(1);
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    background var(--duration-base, 200ms) var(--ease-out),
+    border-color var(--duration-base, 200ms) var(--ease-out),
+    box-shadow var(--duration-base, 200ms) var(--ease-out);
+}
+
+.short-card:hover .short-card__play,
+.short-card:focus-visible .short-card__play {
+  background: var(--glass-bg-dark, rgba(0, 0, 0, 0.4));
+  border-color: rgba(255, 255, 255, 0.28);
+  backdrop-filter: var(--glass-blur, blur(12px));
+  -webkit-backdrop-filter: var(--glass-blur, blur(12px));
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+/* Touch viewports never trigger :hover — show the glass disc at rest so the
+   play affordance is still legible on mobile. Slightly softer than the
+   desktop hover state so it reads as ambient rather than active. */
+@media (hover: none) and (pointer: coarse) {
+  .short-card__play {
+    background: rgba(0, 0, 0, 0.32);
+    border-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
+@media (max-width: 480px) {
+  .short-card__play {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* Listing-type badge — same top-left anchor as PropertyCard so the
+   rent/sale signal sits where users already expect it. We don't
+   restyle the badge itself; ListingTypeBadge.css owns its visual. */
+.short-card__listing-badge {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 1;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.2));
+  backdrop-filter: blur(2px);
+}
+
+/* Bottom-anchored glass panel — title + price ride on top of a
+   translucent dark surface with a backdrop blur. The blur softens
+   the poster underneath so white/lime text always meets contrast
+   without blacking out the image the way a full opaque bar would.
+   `--glass-bg-dark` + `--glass-blur` are the same tokens that power
+   the play-disc on hover, keeping the chrome consistent.
+   The hairline top border separates panel from poster cleanly.
+   `pointer-events: none` preserves the card's click target. The
+   vendor-prefixed `-webkit-backdrop-filter` covers Safari/iOS; the
+   `@supports` fallback gives a heavier opaque background where
+   backdrop-filter isn't implemented — same UX intent, no blur. */
+.short-card__overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #fff;
+  /* Slightly deeper tint than the play-disc glass (0.4 → 0.55) — the
+     overlay is bigger and constantly visible, so it needs more
+     opacity to anchor text contrast without blocking the poster.
+     The blur still softens whatever shows through. */
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: var(--glass-blur) saturate(140%);
+  -webkit-backdrop-filter: var(--glass-blur) saturate(140%);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  pointer-events: none;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .short-card__overlay {
+    background: rgba(0, 0, 0, 0.72);
+  }
+}
+
+/* Title — mirrors `.short-item__title` from the vertical feed (heading
+   font, semibold, 2-line clamp, drop shadow), one size step down for
+   the shelf-card density. The vertical feed uses `--text-lg` at full-
+   screen; `--text-sm` here keeps the type-scale ratio intact. */
+.short-card__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  /* Bumped one step (semibold → bold) — heavier glyph weight is the
+     cheapest contrast lift on a glass panel: more pixels per character
+     are pure white, so the eye locks onto the text instead of the
+     blurred poster underneath. */
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Layered shadow: the inner 0/1/2 shadow hardens the glyph edges
+     against the blur, the outer 0/2/8 shadow gives a soft halo that
+     separates the text from any high-frequency texture bleeding
+     through the glass. Two shadows on one element is cheap; both
+     paint inside the same layer. */
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* Price — accent lime (#BFFF00), bold, sits below the title.
+   `--text-sm` mirrors the shelf-card title size; the vertical feed
+   uses `--text-base` at the larger scale. */
+.short-card__price {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-accent);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

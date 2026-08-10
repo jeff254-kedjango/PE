@@ -1,0 +1,303 @@
+/* ==========================================================================
+   AGENTS PAGE — Reuses .cc-agent-card / .cc-agent-btn from CustomerCarePage.css
+   so styles stay consistent across both pages.
+   ========================================================================== */
+
+@import './CustomerCarePage.css';
+
+.ag-page {
+  min-height: 100vh;
+  padding-top: calc(var(--navbar-height) + var(--space-8));
+  padding-bottom: var(--space-12);
+  background: var(--color-bg);
+}
+
+.ag-hero {
+  text-align: center;
+  padding: var(--space-8) var(--space-4) var(--space-6);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.ag-hero__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-accent);
+  margin-bottom: var(--space-4);
+}
+
+.ag-hero__title {
+  font-family: var(--font-heading);
+  font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+  font-weight: var(--weight-bold);
+  color: var(--color-primary);
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.02em;
+}
+
+.ag-hero__subtitle {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.ag-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+/* On desktop the content sits inside the right half (.ag-right-col), so it must
+   fill that column rather than re-centre at 1280px. Scoped so the mobile
+   single-column path keeps the centred container above. */
+.ag-right-col .ag-content {
+  max-width: none;
+  margin: 0;
+}
+
+/* ── Tile grid override (AgentsPage only) ──
+ * Reuses .cc-agent-card structure from CustomerCarePage.css but flips its
+ * row layout to a tile/card layout. Scoped under .ag-page so the
+ * CustomerCarePage listing layout is untouched.
+ *
+ * Performance:
+ * - Pure CSS, no JS layout work, no resize listeners. `repeat(auto-fill,
+ *   minmax(...))` is a single declarative rule the browser solves with
+ *   its native grid algorithm — far cheaper than media-query-driven JS
+ *   layouts or virtualization for a 12-item page.
+ * - `content-visibility: auto` on each tile lets the browser skip rendering
+ *   work for off-screen tiles. With a 12-card page this is a small win;
+ *   with longer agent lists it scales linearly with no extra code.
+ * - We deliberately do NOT change image sizing here — the existing avatar
+ *   is 56px and already `loading="lazy"`. Tiles just rearrange their
+ *   children with flex-direction: column. No new image fetches.
+ */
+.ag-page .cc-agents__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+.ag-page .cc-agent-card {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  min-width: 0;            /* prevent grid blow-out from long emails */
+  contain: layout paint;   /* isolate paint/layout to each tile */
+  content-visibility: auto;
+  contain-intrinsic-size: 0 280px; /* hint for off-screen reservation */
+}
+
+/* Tile layout: the avatar is the visual anchor and the name + email read as a
+ * centered block directly beneath it (per UX request). Avatar centering and the
+ * text centering are both pure CSS — no JS, no layout listener. */
+.ag-page .cc-agent-card__left {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+}
+
+.ag-page .cc-agent-card__avatar {
+  width: 72px;
+  height: 72px;
+  align-self: center;       /* keep the avatar visually centered */
+}
+
+.ag-page .cc-agent-card__info {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;      /* center name + email under the avatar */
+}
+
+.ag-page .cc-agent-card__name,
+.ag-page .cc-agent-card__email {
+  text-align: center;
+}
+
+/* Actions: 2-column compact grid inside the tile so all 5 buttons stay
+   readable without overflowing on narrow viewports. */
+.ag-page .cc-agent-card__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  width: 100%;
+  margin-top: auto;        /* push actions to bottom for equal-height tiles */
+}
+
+.ag-page .cc-agent-card__actions .cc-agent-btn--listings {
+  grid-column: span 2;     /* full-width primary action */
+}
+
+/* Center the icon + label inside each action button.
+ * The base .cc-agent-btn is inline-flex with default left-alignment — fine
+ * for the wide CustomerCare layout but wrong for compact tiles. Centering
+ * keeps every label visually balanced regardless of text length. */
+.ag-page .cc-agent-btn {
+  justify-content: center;
+  text-align: center;
+}
+
+/* Icon-only mode for small viewports — labels are visually hidden but
+ * remain in the accessibility tree (the `clip-path` technique). Native
+ * `title=` attributes on the buttons give sighted users a tooltip with
+ * zero JS overhead. The disabled "Soon" badge is also hidden in icon-only
+ * mode; the `title` already communicates the disabled state.
+ *
+ * Performance: a single media query toggling two declarations — no JS,
+ * no resize listener, no re-render. The browser handles it entirely. */
+.ag-page .cc-agent-btn__label {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Icon-only mode applies on small phones (≤480px) AND on the tablet band
+   (768–1024px). In the 2-column desktop split the right half is narrow on a
+   tablet, so the same compact icon-only row mobile uses keeps the 5 actions
+   from wrapping/squeezing. One shared rule-set, two viewport ranges (no
+   duplication); ≥1025px keeps the labelled 2-col button grid. */
+@media (max-width: 480px), (min-width: 768px) and (max-width: 1024px) {
+  /* Icon-only mode: the four contact actions (Call / WhatsApp / Chat / Video)
+     are square icon buttons in one row; the primary "Listings" action drops to
+     its own full-width row BELOW them and keeps its text label + count, so the
+     most useful action stays legible while the tile stays compact. */
+  .ag-page .cc-agent-card__actions {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-1);
+  }
+  .ag-page .cc-agent-btn {
+    padding: var(--space-2);
+    min-width: 40px;
+    min-height: 40px;
+    aspect-ratio: 1 / 1;
+  }
+  /* Listings: full-width labelled bar on its own row (not a square icon). */
+  .ag-page .cc-agent-card__actions .cc-agent-btn--listings {
+    grid-column: 1 / -1;
+    aspect-ratio: auto;
+    min-height: 40px;
+  }
+  /* Hide every label + the "Soon" badges EXCEPT the Listings label, which stays
+     visible (it carries the count). Still announced to screen readers. */
+  .ag-page .cc-agent-btn__label:not(.cc-agent-btn__label--listings),
+  .ag-page .cc-agent-btn__badge {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* On very narrow viewports (e.g. <360px) collapse the OUTER grid to one
+   column per tile. The action-row inside each tile stays a single row of
+   icon-only buttons (the 480px rule above still applies). */
+@media (max-width: 380px) {
+  .ag-page .cc-agents__list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Desktop / tablet (≥768px): a 50 / 50 split between the navbar's bottom
+ *    edge and the footer's top border ──
+ *
+ * LEFT half: the embedded vertical short-video feed. The COLUMN spans the full
+ *   height of the content region (navbar bottom → footer top) on a solid black
+ *   backdrop, so any height the video itself doesn't occupy reads as intentional
+ *   black (per spec). The FEED inside is pinned with position:sticky at viewport
+ *   height, so it stays in view while the agent tiles scroll past it on the page
+ *   scrollbar; the black column behind it covers the remainder. No JS.
+ * RIGHT half: the "Our Agents" hero + search + the agent tiles (exactly 2
+ *   columns of cards within the half).
+ *
+ * Layout mechanics: `align-items: stretch` (grid default) makes .ag-video-col
+ * grow to the full row height — which equals the right column's content height,
+ * i.e. exactly the navbar→footer span. The page top/bottom padding is collapsed
+ * to navbar-height / 0 so the left half sits flush against both edges.
+ *
+ * Performance: pure CSS — one sticky element + a static 2-col grid. No resize
+ * listeners, no per-frame layout. Mobile (<768px) never sees these rules and
+ * never mounts the feed (conditional render in AgentsPage.tsx), so its UI/UX is
+ * unchanged.
+ */
+@media (min-width: 768px) {
+  .ag-page {
+    padding-top: var(--navbar-height); /* flush to the navbar's bottom edge */
+    padding-bottom: 0;                 /* flush to the footer's top border */
+  }
+
+  .ag-layout {
+    display: grid;
+    grid-template-columns: 45% 55%;    /* video left 45%, content right 55% */
+    gap: 0;                            /* halves meet flush; the left owns black */
+    align-items: stretch;              /* left column fills the full row height */
+  }
+
+  /* Left half — black backdrop spanning navbar bottom → footer top. */
+  .ag-video-col {
+    background: #000;
+    min-height: calc(100dvh - var(--navbar-height));
+  }
+
+  /* The feed is pinned at viewport height so it stays visible as the right
+     column scrolls; the black .ag-video-col behind it fills any extra height. */
+  .ag-video-col .vertical-video-feed--embedded {
+    position: sticky;
+    top: var(--navbar-height);
+    height: calc(100dvh - var(--navbar-height));
+    border-radius: 0;                  /* flush seam with the right half */
+  }
+
+  /* Right half — give the content breathing room from the centre seam and top.
+     Top padding sets the navbar→"Our Agents" gap: base 32px + 20px = 52px. */
+  .ag-right-col {
+    padding: calc(var(--space-8) + var(--space-5)) var(--space-6) var(--space-12);
+  }
+
+  .ag-right-col .ag-hero {
+    margin: 0 auto var(--space-2); /* stay centred in the half, tighter below */
+    padding-top: 0;
+  }
+
+  /* 4-ish auto-fill columns → exactly 2, to fit inside the right half. */
+  .ag-page .cc-agents__list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── Tablet (768–1024px): the right half is narrow, so trim its padding and the
+   inter-card gap so the 2 columns of cards breathe instead of being squeezed
+   against the centre seam and the screen edge. The card-button icon-only layout
+   (4 icons + a full-width Listings row) is handled by the shared rule above. ── */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .ag-right-col {
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+  }
+  .ag-page .cc-agents__list {
+    gap: var(--space-3);
+  }
+}
+
+.ag-search {
+  margin-bottom: var(--space-6);
+}
+
+.ag-results {
+  scroll-margin-top: calc(var(--navbar-height) + var(--space-4));
+}

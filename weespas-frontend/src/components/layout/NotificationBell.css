@@ -1,0 +1,147 @@
+/* Notification bell + dropdown inbox. Anchored to the bell button; the panel
+   floats below it. Styled to match the navbar's icon-buttons and the RiskPill's
+   pulsing-dot / reduced-motion treatment. */
+
+.notif {
+  position: relative;
+  display: inline-flex;
+}
+
+.notif__trigger {
+  position: relative;
+}
+
+/* The unread badge reuses .navbar__badge; this just nudges its pulse. */
+.notif__badge {
+  animation: notif-badge-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes notif-badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+.notif__panel {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  width: min(360px, calc(100vw - var(--space-4) * 2));
+  max-height: min(70vh, 480px);
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-white);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+  z-index: 1000;
+  animation: notif-panel-in 140ms ease-out;
+}
+
+@keyframes notif-panel-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.notif__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.notif__title {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-base);
+  color: var(--color-text);
+}
+
+.notif__mark-all {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-accent);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.notif__mark-all:hover { color: var(--color-accent-hover); }
+.notif__mark-all:disabled { opacity: 0.5; cursor: default; }
+
+.notif__list {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.notif__empty {
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  color: var(--color-text-tertiary);
+  font-size: var(--text-sm);
+}
+
+.notif__item {
+  display: flex;
+  gap: var(--space-2);
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.notif__item:hover { background: rgba(0, 0, 0, 0.03); }
+.notif__item--unread { background: rgba(var(--color-accent-rgb, 16, 185, 129), 0.06); }
+
+.notif__dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  animation: notif-dot-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes notif-dot-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.notif__item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.notif__item-title {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+}
+
+.notif__item-text {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.notif__item-time {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notif__badge,
+  .notif__dot { animation: none; }
+  .notif__panel { animation: none; }
+}

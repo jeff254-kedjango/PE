@@ -1,0 +1,212 @@
+/* ==========================================================================
+   SELLER FORM — shared field / button / toggle styles for the product forms.
+   Extracted from SellerModal.css so these styles travel with the COMPONENTS that
+   use the classes (ProductFields, ComposerBox), not just the modal shell. Before
+   this split the rules lived only in SellerModal.css (imported by the seller-console
+   modal), so the SAME ProductFields markup rendered UNSTYLED inside the inline
+   timeline composer on /trade — its inputs/buttons fell back to browser defaults.
+   Imported by ProductFields.tsx (fields + toggle) and ComposerBox.tsx (buttons).
+   ========================================================================== */
+
+/* Form layout wrapper. Referenced by every seller form (CreateShop/CreateListing/Promote) and the
+   composer's product pane, but was never defined — they leaned on the modal body's gap, so the
+   inline composer form had no inter-field spacing. Define it once here: stack fields with a
+   consistent gap, matching the modal body. */
+.seller-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Shared form-field styles used by the seller forms. */
+.seller-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.seller-field > label {
+  font-size: 0.85rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.seller-field input,
+.seller-field select,
+.seller-field textarea {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid rgba(2, 44, 34, 0.16);
+  border-radius: var(--radius-md, 8px);
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+  background: var(--color-bg-white, #fff);
+}
+
+.seller-field input:focus-visible,
+.seller-field select:focus-visible,
+.seller-field textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-primary-light);
+}
+
+.seller-field__textarea {
+  resize: vertical;
+  min-height: 88px;
+  line-height: 1.5;
+}
+
+.seller-field__hint {
+  font-weight: var(--weight-regular, 400);
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+}
+
+.seller-field__counter {
+  align-self: flex-end;
+  font-size: 0.72rem;
+  color: var(--color-text-tertiary);
+}
+
+.seller-field--row {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.seller-field--row > .seller-field {
+  flex: 1;
+}
+
+.seller-btn {
+  appearance: none;
+  border-radius: var(--radius-pill, 999px);
+  padding: var(--space-3) var(--space-5);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  border: 1px solid var(--color-primary);
+}
+
+.seller-btn--primary {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.seller-btn--ghost {
+  background: transparent;
+  color: var(--color-primary);
+}
+
+/* Destructive action (delete a listing) — red outline/fill, distinct from the primary CTA. */
+.seller-btn--danger {
+  background: transparent;
+  color: var(--color-danger, #c0392b);
+  border-color: var(--color-danger, #c0392b);
+}
+
+.seller-btn--danger:hover:not(:disabled) {
+  background: var(--color-danger, #c0392b);
+  color: var(--color-text-inverse, #fff);
+}
+
+.seller-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* Pushes the trailing footer buttons to the right, leaving Delete on the left. */
+.seller-modal__spacer {
+  flex: 1;
+}
+
+/* A hint rendered on its own line (block) rather than inline beside a label. */
+.seller-field__hint--block {
+  display: block;
+  margin-top: var(--space-2);
+}
+
+/* Inline delete-confirmation shown inside the edit modal body (replaces the form). */
+.seller-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.seller-confirm__msg {
+  line-height: 1.5;
+  color: var(--color-text-primary, #1a1a1a);
+}
+
+.seller-confirm__actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+
+.seller-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.88rem;
+  color: var(--color-text-primary);
+}
+
+/* ── Handle field (§8 shareable /shop/<handle>) ──
+   The input sits inline with a small "/shop/" prefix affordance so the seller sees the URL
+   context without a second label. The right-side badge ("Available" / "Checking…") shares the
+   input's baseline. Errors get their own line below (block-level) so the layout doesn't jump. */
+.seller-field__handle-row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.seller-field__handle-prefix {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-2);
+  color: var(--color-text-secondary);
+  font-family: monospace;
+  font-size: 0.85rem;
+  background: var(--color-surface-alt, rgba(0, 0, 0, 0.04));
+  border-radius: var(--radius-sm, 6px);
+}
+
+.seller-field__handle-row > input {
+  /* Reduce the default flex so the badge on the right has predictable room. */
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.seller-field__handle-badge {
+  align-self: center;
+  flex-shrink: 0;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill, 999px);
+  font-size: 0.72rem;
+  font-weight: var(--weight-semibold);
+  line-height: 1.4;
+}
+
+.seller-field__handle-badge--probing {
+  color: var(--color-text-secondary);
+  background: var(--color-surface-alt, rgba(0, 0, 0, 0.04));
+}
+
+.seller-field__handle-badge--ok {
+  color: var(--color-success-fg, #08745e);
+  background: var(--color-success-bg, rgba(16, 185, 129, 0.14));
+}
+
+/* Inline "why is this red" error for a field. Same tint as toast-error but muted so it doesn't
+   yell — the input's own aria-invalid outline is the primary signal. */
+.seller-field__error {
+  margin: var(--space-1, 4px) 0 0 0;
+  font-size: 0.78rem;
+  color: var(--color-danger, #c0392b);
+}
+
+.seller-field input[aria-invalid="true"] {
+  border-color: var(--color-danger, #c0392b);
+}

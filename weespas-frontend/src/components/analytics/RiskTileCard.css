@@ -1,0 +1,39 @@
+/* Risk-oversight tile. Inherits .chart-card / .analytics-tile from analytics.css;
+   these rules style the "unsafe listings" alarm row. */
+
+.risk-tile__alarm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  margin: var(--space-3, 12px) 0;
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  border: 1px solid rgba(100, 116, 139, 0.25);
+  border-radius: var(--radius-md, 12px);
+  background: rgba(100, 116, 139, 0.08);
+}
+
+/* When there ARE unsafe-flagged listings, the row goes hot (red) to pull the eye. */
+.risk-tile__alarm--hot {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.10);
+}
+
+.risk-tile__alarm-value {
+  font-size: 2rem;
+  font-weight: var(--weight-bold, 700);
+  line-height: 1;
+  color: #475569;
+}
+
+.risk-tile__alarm--hot .risk-tile__alarm-value {
+  color: #b91c1c;
+}
+
+.risk-tile__alarm-label {
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-secondary, #475569);
+}
+
+.risk-tile__strip {
+  margin-top: var(--space-2, 8px);
+}

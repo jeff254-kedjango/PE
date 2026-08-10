@@ -1,0 +1,80 @@
+/* ==========================================================================
+   PROFILE MENU — signed-in account chip in the navbar CTA slot.
+   Avatar trigger + hover/tap "My Profile" popup (mirrors ShopHoverCard).
+   ========================================================================== */
+
+.profile-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Trigger wraps the avatar. Padding 0 keeps the 36px avatar flush; a ≥44px hit box would clash with
+   the tight navbar row, so we keep it avatar-sized (the popup is the affordance, not a big target). */
+.profile-menu__trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--radius-full, 999px);
+}
+
+/* Sizing class ShopAvatar's caller must supply (image + initials variants both read it). 36px to sit
+   comfortably in the navbar row; a subtle accent ring appears on hover / keyboard focus. */
+.navbar__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full, 999px);
+  font-size: 1rem;
+  transition: box-shadow var(--duration-fast, 0.12s) var(--ease-out, ease-out);
+}
+
+.profile-menu__trigger:hover .navbar__avatar,
+.profile-menu__trigger:focus-visible .navbar__avatar {
+  box-shadow: 0 0 0 2px var(--color-accent), 0 0 12px rgba(191, 255, 0, 0.35);
+}
+
+.profile-menu__trigger:focus-visible {
+  outline: none;
+}
+
+/* Popup under the avatar. Right-aligned since the avatar sits at the right end of .navbar__links. */
+.profile-menu__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1000;
+  min-width: 148px;
+  padding: var(--space-2);
+  background: var(--color-surface, #fff);
+  border: 1px solid rgba(2, 44, 34, 0.1);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card-hover, 0 8px 24px rgba(0, 0, 0, 0.16));
+  animation: profile-menu-in var(--duration-fast, 0.12s) var(--ease-out, ease-out);
+}
+
+@keyframes profile-menu-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.profile-menu__item {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm, 6px);
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--duration-fast, 0.12s) var(--ease-out, ease-out);
+}
+
+.profile-menu__item:hover,
+.profile-menu__item:focus-visible {
+  background: rgba(2, 44, 34, 0.06);
+  outline: none;
+}

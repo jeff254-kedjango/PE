@@ -1,0 +1,45 @@
+/* SkeletonCard — shimmer loading state for property grid */
+
+.skeleton-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-bg-white);
+}
+
+.skeleton-card__image {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+}
+
+.skeleton-card__body {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.skeleton-card__title {
+  height: 20px;
+  width: 75%;
+}
+
+.skeleton-card__location {
+  height: 14px;
+  width: 55%;
+}
+
+.skeleton-card__specs {
+  height: 14px;
+  width: 40%;
+}
+
+.skeleton-card__footer {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.skeleton-card__tag {
+  height: 22px;
+  width: 80px;
+  border-radius: var(--radius-full);
+}

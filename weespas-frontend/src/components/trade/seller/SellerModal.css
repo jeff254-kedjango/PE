@@ -1,0 +1,82 @@
+/* ==========================================================================
+   SELLER MODAL — shared portal shell for the seller-console forms.
+   The form-field / button / toggle styles live in the shared sellerForm.css
+   (imported here AND by ProductFields/ComposerBox, so the inline composer on
+   /trade gets them too). This file owns only the modal SHELL.
+   ========================================================================== */
+@import './sellerForm.css';
+
+.seller-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1000);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-6) var(--space-4);
+  overflow-y: auto;
+  background: rgba(2, 44, 34, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.seller-modal {
+  width: 100%;
+  max-width: 540px;
+  margin: auto;
+  background: var(--color-surface, #fff);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg, 0 16px 40px rgba(2, 44, 34, 0.25));
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 2 * var(--space-6));
+}
+
+.seller-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid rgba(2, 44, 34, 0.08);
+}
+
+.seller-modal__head h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.seller-modal__close {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: var(--radius-full, 999px);
+  background: rgba(2, 44, 34, 0.06);
+  color: var(--color-text-primary);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.seller-modal__close:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.seller-modal__body {
+  padding: var(--space-5);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.seller-modal__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid rgba(2, 44, 34, 0.08);
+}

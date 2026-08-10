@@ -1,0 +1,858 @@
+/* ==========================================================================
+   PROPERTY DETAILS — Full property view
+   Mobile: slide-up sheet from bottom.  Desktop: side panel from right.
+   ========================================================================== */
+
+/* ---------- Overlay backdrop ---------- */
+.pd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay, 400);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fadeIn var(--duration-normal, 250ms) var(--ease-out);
+}
+
+/* ---------- Panel container ---------- */
+.pd-panel {
+  position: fixed;
+  z-index: var(--z-modal, 500);
+  background: var(--color-bg-white, #fff);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Desktop: right side panel */
+@media (min-width: 768px) {
+  .pd-panel {
+    top: 0;
+    right: 0;
+    width: 480px;
+    max-width: 40vw;
+    height: 100vh;
+    box-shadow: var(--shadow-xl);
+    animation: slideInRight var(--duration-slow, 400ms) var(--ease-out);
+  }
+}
+
+/* Tablet: wider panel — at 768–1023px the 40vw cap squeezes content
+   awkwardly (the specs grid and video tour thumbs collapse). Give the
+   panel ~70vw so descriptions and the map breathe, while leaving enough
+   of the feed visible behind it for context. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .pd-panel {
+    width: 70vw;
+    max-width: 70vw;
+  }
+}
+
+/* Mobile: slide-up bottom sheet */
+@media (max-width: 767px) {
+  .pd-panel {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 95vh;
+    border-radius: var(--radius-xl, 24px) var(--radius-xl, 24px) 0 0;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.2);
+    animation: slideUp var(--duration-slow, 400ms) var(--ease-out);
+    padding-bottom: calc(var(--bottom-nav-height, 64px) + var(--safe-area-bottom, env(safe-area-inset-bottom, 0px)));
+  }
+}
+
+/* Mobile drag handle */
+.pd-handle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .pd-handle {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-3, 12px) 0 var(--space-1, 4px);
+  }
+  .pd-handle span {
+    width: 36px;
+    height: 4px;
+    border-radius: var(--radius-full);
+    background: var(--color-text-tertiary, #9CA3AF);
+  }
+}
+
+/* ---------- Close button ---------- */
+.pd-close {
+  position: absolute;
+  top: var(--space-3, 12px);
+  right: var(--space-3, 12px);
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--glass-bg-dark, rgba(0, 0, 0, 0.4));
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.pd-close:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- Image carousel ---------- */
+.pd-carousel {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: var(--color-primary-dark, #011A14);
+  overflow: hidden;
+}
+
+@media (max-width: 767px) {
+  .pd-carousel {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+.pd-carousel__track {
+  display: flex;
+  height: 100%;
+  transition: transform var(--duration-slow, 400ms) var(--ease-out);
+}
+
+.pd-carousel__slide {
+  min-width: 100%;
+  height: 100%;
+}
+
+.pd-carousel__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pd-carousel__slide[role="button"] {
+  cursor: zoom-in;
+}
+
+/* Carousel arrow buttons */
+.pd-carousel__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--glass-bg-dark, rgba(0, 0, 0, 0.4));
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.pd-carousel__arrow:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.pd-carousel__arrow--prev {
+  left: var(--space-3, 12px);
+}
+
+.pd-carousel__arrow--next {
+  right: var(--space-3, 12px);
+}
+
+/* Stories-style progress dots */
+.pd-carousel__dots {
+  position: absolute;
+  top: var(--space-3, 12px);
+  left: var(--space-4, 16px);
+  right: var(--space-4, 16px);
+  display: flex;
+  gap: var(--space-1, 4px);
+  z-index: 5;
+}
+
+.pd-carousel__dot {
+  flex: 1;
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+  transition: background var(--duration-fast);
+}
+
+.pd-carousel__dot--active {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.pd-carousel__dot--done {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* Image counter badge */
+.pd-carousel__counter {
+  position: absolute;
+  bottom: var(--space-3, 12px);
+  right: var(--space-3, 12px);
+  z-index: 5;
+  padding: var(--space-1) var(--space-2);
+  background: var(--glass-bg-dark, rgba(0, 0, 0, 0.4));
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-full);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+/* Expand / fullscreen button */
+.pd-carousel__expand {
+  position: absolute;
+  bottom: var(--space-3, 12px);
+  right: calc(var(--space-3, 12px) + 60px);
+  z-index: 5;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--glass-bg-dark, rgba(0, 0, 0, 0.4));
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.pd-carousel__expand:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- Glassmorphic price overlay ---------- */
+.pd-price-overlay {
+  position: absolute;
+  bottom: var(--space-3, 12px);
+  left: var(--space-3, 12px);
+  z-index: 5;
+  padding: var(--space-2) var(--space-4);
+  background: var(--glass-bg, rgba(255, 255, 255, 0.15));
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-lg, 16px);
+  color: #fff;
+}
+
+.pd-price-overlay__amount {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.pd-price-overlay__suffix {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  opacity: 0.8;
+}
+
+/* ---------- Content body ---------- */
+.pd-body {
+  padding: var(--space-5, 20px) var(--space-4, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5, 20px);
+}
+
+/* ---------- Header section ---------- */
+.pd-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.pd-header__badges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  flex-wrap: wrap;
+}
+
+.pd-header__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  line-height: var(--leading-tight);
+  margin: 0;
+}
+
+.pd-header__location {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Action row (Share + Favorite) ---------- */
+.pd-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+}
+
+.pd-actions__share {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.pd-actions__share:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+/* ---------- Vibe tags row ---------- */
+.pd-vibes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 8px);
+}
+
+/* ---------- Specs grid ---------- */
+.pd-specs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3, 12px);
+}
+
+@media (max-width: 767px) {
+  .pd-specs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.pd-spec {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  padding: var(--space-3, 12px);
+  background: var(--color-bg, #F5F5F4);
+  border-radius: var(--radius-md, 10px);
+  text-align: center;
+}
+
+.pd-spec__icon {
+  color: var(--color-primary);
+}
+
+.pd-spec__value {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.pd-spec__label {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---------- Description ---------- */
+.pd-description {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+}
+
+.pd-description h3 {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  margin-bottom: var(--space-2);
+}
+
+/* ---------- Location section ---------- */
+.pd-location {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+}
+
+/* Heading row: "Location" on the left, the InSAR risk pill on the right.
+   Wraps gracefully on a narrow sheet so the pill drops below the heading. */
+.pd-location__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2, 8px);
+  flex-wrap: wrap;
+}
+
+/* Certifier-only "Flag building" action beside the risk pill. */
+.pd-flag-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid rgba(180, 83, 9, 0.35);
+  border-radius: var(--radius-full, 999px);
+  background: rgba(245, 158, 11, 0.10);
+  color: #b45309;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.pd-flag-btn:hover {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(180, 83, 9, 0.5);
+}
+
+/* Owner-only "Confirm your building" banner CTA — appears under the address when a
+   clustered pin needs the owner to pick the right footprint. Tappable full-width row. */
+.pd-confirm-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: var(--radius-lg, 12px);
+  background: rgba(59, 130, 246, 0.08);
+  color: #1d4ed8;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.pd-confirm-cta:hover {
+  background: rgba(59, 130, 246, 0.14);
+  border-color: rgba(59, 130, 246, 0.55);
+}
+
+.pd-confirm-cta > span {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.pd-confirm-cta small {
+  color: #475569;
+  font-size: var(--text-xs);
+  margin-top: 2px;
+}
+
+.pd-location h3 {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.pd-location__address {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.pd-location__map {
+  width: 100%;
+  height: 200px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  z-index: 0;
+}
+
+.pd-location__directions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-2, 8px) var(--space-4, 16px);
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-inverse);
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: opacity var(--duration-fast) var(--ease-out);
+  align-self: flex-start;
+}
+
+.pd-location__directions:hover {
+  opacity: 0.9;
+}
+
+/* Now a <button> (reveal-gated), not an <a> — reset the native chrome. */
+.pd-location__directions {
+  border: none;
+  cursor: pointer;
+}
+.pd-location__directions:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* "View Building Risk Analysis" — secondary (outlined) sibling to the primary directions CTA.
+   Free InSAR surface, so it reads as a calmer, lower-commitment action. */
+.pd-location__risk-map {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  margin-top: var(--space-2, 8px);
+  padding: var(--space-2, 8px) var(--space-4, 16px);
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
+  background: transparent;
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  align-self: flex-start;
+}
+.pd-location__risk-map:hover {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.pd-location__approx {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 4px;
+  font-size: var(--text-sm, 0.85rem);
+  color: var(--color-text-tertiary, #868d96);
+}
+
+.pd-location__map-placeholder {
+  width: 100%;
+  height: 160px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+/* ---------- Agent card ---------- */
+.pd-agent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 16px);
+  padding: var(--space-4, 16px);
+  background: var(--color-bg, #F5F5F4);
+  border-radius: var(--radius-lg, 16px);
+}
+
+.pd-agent__photo {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  background: var(--color-primary-light);
+  flex-shrink: 0;
+}
+
+.pd-agent__photo--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-inverse);
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+}
+
+.pd-agent__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pd-agent__name {
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+}
+
+.pd-agent__role {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* Agent CTA buttons */
+.pd-agent__ctas {
+  display: flex;
+  gap: var(--space-2, 8px);
+  margin-top: var(--space-3, 12px);
+}
+
+.pd-agent__cta {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  border: none;
+  border-radius: var(--radius-md, 10px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.pd-agent__cta--call {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.pd-agent__cta--call:hover {
+  background: var(--color-primary-light);
+}
+
+.pd-agent__cta--whatsapp {
+  background: #25D366;
+  color: #fff;
+}
+
+.pd-agent__cta--whatsapp:hover {
+  background: #1EBE5A;
+}
+
+/* ---------- Video Tour section ---------- */
+.pd-video-tour {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+}
+
+.pd-video-tour h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.pd-video-tour__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-3, 12px);
+}
+
+.pd-video-tour__thumb {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-md, 10px);
+  overflow: hidden;
+  background: var(--color-primary-dark, #011A14);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.pd-video-tour__thumb:hover {
+  transform: scale(1.03);
+}
+
+.pd-video-tour__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pd-video-tour__thumb-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.pd-video-tour__play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.pd-video-tour__thumb:hover .pd-video-tour__play-overlay {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.pd-video-tour__play-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--glass-bg, rgba(255, 255, 255, 0.2));
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  transition: transform var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
+}
+
+.pd-video-tour__thumb:hover .pd-video-tour__play-btn {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.pd-video-tour__title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  text-align: left;
+  line-height: var(--leading-snug);
+}
+
+/* ---------- Video Player Modal ---------- */
+.pd-video-modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 500);
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn var(--duration-normal, 250ms) var(--ease-out);
+}
+
+.pd-video-modal__content {
+  position: relative;
+  width: 90vw;
+  max-width: 900px;
+  max-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pd-video-modal__close {
+  position: absolute;
+  top: -44px;
+  right: 0;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.pd-video-modal__close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.pd-video-modal__player {
+  width: 100%;
+  max-height: 80vh;
+  border-radius: var(--radius-lg, 16px);
+  background: #000;
+  outline: none;
+}
+
+@media (max-width: 767px) {
+  .pd-video-tour__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-video-modal__content {
+    width: 100vw;
+    max-width: none;
+  }
+
+  .pd-video-modal__close {
+    top: var(--space-3, 12px);
+    right: var(--space-3, 12px);
+  }
+
+  .pd-video-modal__player {
+    border-radius: 0;
+    max-height: 100vh;
+  }
+}
+
+/* ---------- Section divider ---------- */
+.pd-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+  border: none;
+  margin: 0;
+}

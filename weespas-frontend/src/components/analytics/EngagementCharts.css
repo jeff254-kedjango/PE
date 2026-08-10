@@ -1,0 +1,61 @@
+/* ==========================================================================
+   ENGAGEMENT SECTION — three role-segmented line charts on the Staff dashboard.
+
+   Layout: stacked column on mobile (one chart per row, full width), 3-up grid
+   on wide screens. We do NOT use minmax/auto-fit here because the chart cards
+   render an SVG via recharts ResponsiveContainer; an indeterminate parent
+   width causes recharts to remeasure on every layout pass, which costs us
+   ~40ms per re-render on low-end mobile. Fixed breakpoint = deterministic
+   width = no re-measure churn.
+   ========================================================================== */
+
+.engagement-section {
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.engagement-section__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.engagement-section__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-emerald-deep, #064e3b);
+  margin: 0;
+}
+
+.engagement-section__sub {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0.15rem 0 0 0;
+}
+
+.engagement-section__toggle {
+  flex: 0 0 auto;
+}
+
+.engagement-section__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+@media (min-width: 1100px) {
+  .engagement-section__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Subtle role-card differentiator — keeps the cards visually grouped while
+   still letting the user scan which line maps to which role. */
+.engagement-chart {
+  display: flex;
+  flex-direction: column;
+}

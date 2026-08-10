@@ -1,0 +1,312 @@
+/* ==========================================================================
+   NAVBAR SEARCH — inline unified search (Properties + Trade).
+
+   Desktop: a compact box sitting in the navbar row; results drop as a list ANCHORED directly under
+   the box (absolute, within .navbar-search--inline). Mobile: the magnifier expands a full-width bar
+   under the navbar (portal + light backdrop) with the same dropdown below it.
+   ========================================================================== */
+
+/* ── Shared box (input pill) ── */
+.navbar-search__box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.navbar-search__box-icon {
+  position: absolute;
+  left: var(--space-3, 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+  display: flex;
+}
+
+.navbar-search__input {
+  width: 100%;
+  min-height: 40px;
+  padding: var(--space-2) calc(var(--space-3) + 28px) var(--space-2) calc(var(--space-3) + 28px);
+  border: 1.5px solid rgba(2, 44, 34, 0.12);
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  background: var(--color-bg);
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out);
+}
+
+.navbar-search__input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.navbar-search__input:focus {
+  border-color: var(--color-accent);
+  background: var(--color-bg-white);
+  box-shadow: 0 0 0 3px var(--color-accent-muted);
+}
+
+.navbar-search__clear {
+  position: absolute;
+  right: var(--space-2, 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: rgba(2, 44, 34, 0.08);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.navbar-search__clear:hover {
+  background: rgba(2, 44, 34, 0.15);
+  color: var(--color-text);
+}
+
+/* ── Inline variant (desktop): box in the navbar, dropdown anchored below ── */
+.navbar-search--inline {
+  position: relative;
+  width: 280px;
+  max-width: 340px;
+}
+
+/* A little breathing room + slight grow when the box is focused, so it reads as the active element.
+   Resting/focused/max all shift together by the same 10px so the focus grow-delta stays 40px. */
+.navbar-search--inline:focus-within {
+  width: 320px;
+}
+
+.navbar-search__dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-2, 8px));
+  left: 0;
+  right: 0;
+  z-index: var(--z-modal, 500);
+  max-height: min(70vh, 520px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background: var(--color-bg-white, #fff);
+  border: 1px solid rgba(2, 44, 34, 0.08);
+  border-radius: var(--radius-xl, 20px);
+  box-shadow: var(--shadow-xl, 0 12px 40px rgba(0, 0, 0, 0.16));
+  padding: var(--space-2, 8px);
+  animation: navbarSearchDrop var(--duration-fast, 160ms) var(--ease-out);
+}
+
+@keyframes navbarSearchDrop {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Overlay variant (mobile): full-width bar under the navbar + backdrop ── */
+.navbar-search__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay, 400);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: fadeIn var(--duration-normal, 250ms) var(--ease-out);
+}
+
+.navbar-search--overlay {
+  position: fixed;
+  z-index: var(--z-modal, 500);
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-white, #fff);
+  border-radius: 0 0 var(--radius-xl, 20px) var(--radius-xl, 20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
+  animation: navbarSearchSheet var(--duration-normal, 250ms) var(--ease-out);
+}
+
+@keyframes navbarSearchSheet {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.navbar-search__overlay-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-4, 16px);
+  border-bottom: 1px solid rgba(2, 44, 34, 0.06);
+  flex-shrink: 0;
+}
+
+.navbar-search__overlay-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--color-bg, #f5f5f5);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+}
+
+.navbar-search__overlay-close:hover {
+  background: rgba(2, 44, 34, 0.08);
+  color: var(--color-text);
+}
+
+.navbar-search__dropdown--overlay {
+  position: static;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  animation: none;
+  flex: 1;
+  max-height: none;
+  padding: var(--space-2, 8px) var(--space-3, 12px) var(--space-4, 16px);
+}
+
+/* ── Sections (Homes / Shops & Products) ── */
+.navbar-search__section + .navbar-search__section {
+  margin-top: var(--space-2, 8px);
+  padding-top: var(--space-2, 8px);
+  border-top: 1px solid rgba(2, 44, 34, 0.06);
+}
+
+.navbar-search__section-title {
+  margin: 0;
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.navbar-search__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Result row ── */
+.navbar-search__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.navbar-search__row:hover {
+  background: var(--color-bg);
+}
+
+.navbar-search__thumb {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-accent-muted);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-search__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.navbar-search__row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navbar-search__row-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-search__row-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.navbar-search__row-price {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.navbar-search__row-place {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-search__row-cat {
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.navbar-search__row-chevron {
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+}
+
+/* ── Hint / loading / error / empty states ── */
+.navbar-search__hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+  padding: var(--space-8, 32px) var(--space-4);
+  color: var(--color-text-tertiary);
+}
+
+.navbar-search__hint p {
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.navbar-search__hint--error {
+  color: var(--color-error);
+}

@@ -1,0 +1,110 @@
+/* ==========================================================================
+   REACH CHOOSERS — shared styles for PromoteChooser + BoostChooser modals.
+   ========================================================================== */
+
+.reach {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.reach__intro {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.reach__intro strong { color: var(--color-text-primary); }
+
+.reach__state {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--color-text-secondary);
+}
+
+/* ── Promote: mode radios ── */
+.reach__fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.reach__fieldset legend {
+  font-size: 0.85rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  padding: 0;
+  margin-bottom: 2px;
+}
+
+.reach__radio {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid rgba(2, 44, 34, 0.12);
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+}
+
+.reach__radio input { margin-top: 3px; }
+
+.reach__radio span { display: flex; flex-direction: column; gap: 2px; }
+.reach__radio strong { font-size: 0.9rem; color: var(--color-text-primary); }
+.reach__radio em { font-style: normal; font-size: 0.82rem; color: var(--color-text-secondary); }
+
+/* ── Boost: tier cards ── */
+.reach__active {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md, 8px);
+  background: rgba(2, 44, 34, 0.05);
+  font-size: 0.88rem;
+  color: var(--color-text-primary);
+}
+
+.reach__tiers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.reach__tier {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid rgba(2, 44, 34, 0.12);
+  border-radius: var(--radius-md, 8px);
+}
+
+.reach__tier--spent { opacity: 0.6; }
+
+.reach__tier-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.reach__tier-info strong { font-size: 0.95rem; color: var(--color-text-primary); }
+.reach__tier-info em { font-style: normal; font-size: 0.82rem; color: var(--color-text-secondary); }
+
+.reach__tier-quota {
+  font-size: 0.78rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
+}
+
+.reach__tier--spent .reach__tier-quota { color: var(--color-danger, #b3261e); }
+
+.reach__tier-price {
+  font-size: 0.78rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}

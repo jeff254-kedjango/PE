@@ -1,0 +1,78 @@
+.shop-image {
+  flex: 1;
+}
+
+.shop-image__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.shop-image__preview {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-surface-2, #f0f0f0);
+  border: 1px dashed var(--color-border, #ccc);
+}
+
+.shop-image__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shop-image__preview--circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
+
+.shop-image__preview--wide {
+  width: 96px;
+  height: 48px;
+  border-radius: var(--radius-2, 8px);
+}
+
+.shop-image__placeholder {
+  font-size: 1.4rem;
+  color: var(--color-text-tertiary, #999);
+  line-height: 1;
+}
+
+.shop-image__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* The native file input is driven by the styled button; keep it out of the layout but reachable. */
+.shop-image__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.shop-image__btn {
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.82rem;
+}
+
+.shop-image__remove {
+  appearance: none;
+  background: none;
+  border: none;
+  color: var(--color-danger, #c0392b);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+}
+
+.shop-image__remove:disabled {
+  opacity: 0.55;
+  cursor: default;
+}

@@ -1,0 +1,48 @@
+/* ==========================================================================
+   SHOP PAGE — page-mount chrome around the <Storefront>.
+   Owns ONLY the top-bar (back link). The storefront body owns its own styling
+   in Storefront.css so both mounts (page + sheet) look identical inside.
+   ========================================================================== */
+
+.shop-page {
+  /* ShopPage now owns the outer chrome (page centering + horizontal padding + back-link topbar).
+     Storefront is a plain body element that fills its parent. Chunk A collapsed the sheet mount
+     so there is only ONE mount class on Storefront now, and the page width is owned here. */
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.shop-page__topbar {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) 0;
+}
+
+/* "← Back to Trade" link — plain link tone, generous tap target (touch users). Deliberately not
+   a button: this is navigation, not an action, so a semantic <a> (react-router <Link>) is right. */
+.shop-page__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 6px);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-weight: var(--weight-semibold, 600);
+  text-decoration: none;
+  border-radius: var(--radius-pill, 999px);
+  transition: background 120ms ease;
+}
+
+.shop-page__back:hover {
+  background: var(--color-surface-alt, rgba(0, 0, 0, 0.04));
+}
+
+.shop-page__back:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+/* No .storefront--page override needed after Chunk A — Storefront no longer sets its own
+   max-width/margin; ShopPage owns the outer chrome. Kept the comment to explain why this file
+   is otherwise thin. */

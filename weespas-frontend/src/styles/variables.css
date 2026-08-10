@@ -1,0 +1,201 @@
+/* ==========================================================================
+   DESIGN TOKENS — Weespas Brand System
+   All CSS custom properties live here. Every component references these
+   instead of hard-coded values, enabling theme changes from one file.
+   ========================================================================== */
+
+:root {
+  /* ── Brand Colors ── */
+  --color-primary: #022C22;          /* Midnight Emerald — nav, headings, footers */
+  --color-primary-light: #064E3B;    /* Lighter emerald for hover states */
+  --color-primary-dark: #011A14;     /* Darker emerald for active states */
+
+  --color-accent: #BFFF00;           /* Electric Lime — CTAs, active indicators */
+  --color-accent-hover: #A8E600;     /* Lime hover state */
+  --color-accent-muted: rgba(191, 255, 0, 0.15); /* Lime tint for backgrounds */
+
+  --color-bg: #F5F5F4;              /* Soft Sand — page background */
+  --color-bg-white: #FFFFFF;         /* Card backgrounds */
+  --color-bg-dark: #1A1A1A;          /* Dark sections (footer) */
+  --color-surface: #FFFFFF;          /* Raised surfaces (modals, dialogs). MUST stay
+                                        opaque: it sits over the translucent modal overlay,
+                                        so a transparent value makes form text unreadable. */
+
+  /* ── Text Colors ── */
+  --color-text: #1A1A1A;             /* Primary body text */
+  --color-text-secondary: #6B7280;   /* Muted/secondary text */
+  --color-text-tertiary: #9CA3AF;    /* Captions, timestamps */
+  --color-text-inverse: #FFFFFF;     /* Text on dark backgrounds */
+  --color-text-on-accent: #022C22;   /* Text on Electric Lime */
+
+  /* ── Semantic Colors ── */
+  --color-success: #10B981;          /* Verified badges, success states */
+  --color-error: #EF4444;            /* Error states, favorite hearts */
+  --color-warning: #F59E0B;          /* Warnings */
+  --color-info: #3B82F6;             /* Info badges */
+  --color-heart: #EF4444;            /* Favorite heart color */
+  --color-heart-bg: rgba(239, 68, 68, 0.1);
+  --color-cyan: #06B6D4;             /* Inquiry/"Ask" active toggle (trade engagement bar) */
+
+  /* ── Listing Type Colors ── */
+  --color-sale: #022C22;             /* "FOR SALE" badge */
+  --color-sale-bg: rgba(191, 255, 0, 0.9);
+  --color-rent: #1E40AF;             /* "FOR RENT" badge */
+  --color-rent-bg: rgba(59, 130, 246, 0.9);
+
+  /* ── Shop Category Colors (§8 trending rail + feed card tint) ──
+     One distinct, WCAG-legible hue per trade category — the "different stimulus per category"
+     the rail relies on. Slugs mirror commerce core/categories.py; the slug→token map lives in
+     utils/categories.ts (backend never sends a color, only the slug). */
+  --color-cat-butchery: #DC2626;     /* red */
+  --color-cat-bakery: #D97706;       /* amber */
+  --color-cat-greengrocer: #16A34A;  /* green (mama mboga) */
+  --color-cat-restaurant: #EA580C;   /* orange */
+  --color-cat-boutique: #7C3AED;     /* purple (exotic / wedding) */
+  --color-cat-electronics: #2563EB;  /* blue */
+  --color-cat-shoes: #4F46E5;        /* indigo */
+  --color-cat-beauty: #DB2777;       /* pink (salon) */
+  --color-cat-hardware: #475569;     /* slate */
+  --color-cat-pharmacy: #0D9488;     /* teal */
+  --color-cat-general: #022C22;      /* brand green (duka) */
+  --color-cat-neutral: #6B7280;      /* un-categorised fallback (matches --color-text-secondary) */
+
+  /* ── Typography ── */
+  --font-heading: 'Plus Jakarta Sans', 'Nunito', system-ui, sans-serif;
+  --font-body: 'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  /* Full type scale. Intermediate steps are kept even when nothing consumes them yet — this is a
+     design-system ramp, so the gaps are the point; reach for the nearest step rather than adding
+     a one-off px value at a call site. */
+  --text-4xs: 0.375rem;   /* 6px */
+  --text-3xs: 0.5rem;     /* 8px */
+  --text-2xs: 0.625rem;   /* 10px */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+  --text-5xl: 3rem;       /* 48px */
+  --text-6xl: 3.75rem;    /* 60px */
+  --text-7xl: 4.5rem;     /* 72px */
+  --text-8xl: 6rem;       /* 96px */
+  --text-9xl: 8rem;       /* 128px */
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* ── Spacing Scale (4px base) ── */
+  --space-1: 0.25rem;     /* 4px */
+  --space-2: 0.5rem;      /* 8px */
+  --space-3: 0.75rem;     /* 12px */
+  --space-4: 1rem;        /* 16px */
+  --space-5: 1.25rem;     /* 20px */
+  --space-6: 1.5rem;      /* 24px */
+  --space-8: 2rem;        /* 32px */
+  --space-10: 2.5rem;     /* 40px */
+  --space-12: 3rem;       /* 48px */
+  --space-16: 4rem;       /* 64px */
+  --space-20: 5rem;       /* 80px */
+
+  /* ── Border Radius ── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.1);
+
+  /* ── Glassmorphism ── */
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-bg-dark: rgba(0, 0, 0, 0.4);
+  --glass-blur: blur(12px);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+
+  /* ── Light Glassmorphism (for white backgrounds) ── */
+  --glass-bg-light: rgba(2, 44, 34, 0.03);
+  --glass-blur-light: blur(8px);
+  --glass-border-light: 1.5px solid rgba(2, 44, 34, 0.1);
+
+  /* ── Hero Shadow ── */
+  --shadow-hero: 0 4px 16px rgba(0, 0, 0, 0.06);
+
+  /* ── Transitions ── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* ── Z-Index Layers ── */
+  --z-base: 0;
+  --z-card: 1;
+  --z-sticky: 100;
+  --z-navbar: 200;
+  --z-dropdown: 300;
+  --z-overlay: 400;
+  --z-modal: 500;
+  /* Modals opened OVER an already-open modal — i.e. launched from inside the
+     property-details panel (--z-modal, 500): the M-Pesa payment/tier chooser,
+     the §8 pro-scale gate, and the structural-flag / confirm-building dialogs.
+     Sits above --z-modal but below --z-toast so confirmation toasts stay
+     visible. Anything in this family MUST use this token, not --z-overlay, or
+     it renders behind the panel and its clicks are swallowed by the map. */
+  --z-nested-modal: 550;
+  --z-toast: 600;
+  --z-bottom-nav: 150;
+
+  /* ── Layout ── */
+  --container-max: 1280px;
+  --container-padding: var(--space-4);
+  --navbar-height: 64px;
+  /* Total sticky-bar footprint = the 64px inner row (--navbar-height) PLUS the
+     .navbar's --space-3 (12px) padding top AND bottom → 88px. The bar renders at
+     this height, so anything sizing itself against the space BELOW the navbar
+     (e.g. the gallery viewport-fit calc) must subtract THIS, not --navbar-height,
+     or it under-counts by 24px. Keep in sync with .navbar padding in Navbar.css. */
+  --navbar-total: calc(var(--navbar-height) + var(--space-3) * 2);
+  /* Property-gallery stage height ceiling. On wide screens the viewport-fit
+     calc (100vh − --navbar-total − gutter) is capped here so the hero holds a
+     clean 16:9 at the --container-max width (1230px content → 692px tall) and
+     never grows taller on very large monitors. Consumed by .gallery-stage and
+     .hero-skeleton (kept in one place so the two can't drift). */
+  --gallery-stage-max: 692px;
+  --bottom-nav-height: 64px;
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* ── Breakpoints (for reference — use in @media queries) ── */
+  /* --bp-mobile: 480px   */
+  /* --bp-tablet: 768px   */
+  /* --bp-laptop: 1024px  */
+  /* --bp-desktop: 1280px */
+
+  /* ── Shorts (horizontal shelf) ──
+     The shelf shows exactly 5 cards filling 100% of the available width.
+     Users navigate left/right via the arrow buttons (or swipe on touch).
+     Width is computed by the track itself using flex-basis with the gap
+     accounted for, so this token is only a fallback for non-shelf contexts.
+
+     Meta strip is a fixed height with a single-line title (ellipsis) +
+     price line. That guarantees every card in the row is the same height.
+  */
+  --shorts-visible-count: 5;
+  --short-card-gap: var(--space-3);
+  --short-card-w: 200px;              /* fallback only; shelf overrides   */
+  --short-feed-max: 480px;            /* used by the vertical feed page   */
+}

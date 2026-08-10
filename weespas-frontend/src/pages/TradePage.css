@@ -1,0 +1,237 @@
+/* ==========================================================================
+   TRADE PAGE — buyer proximity feed surface
+   ========================================================================== */
+
+.trade-page {
+  max-width: var(--container-max, 1200px);
+  margin: 0 auto;
+  /* Top padding clears the FIXED navbar (real height ≈ 88px: --navbar-height 64 + 2×--space-3
+     padding) and adds a deliberate --space-4 margin, so the trending rail — now the first child —
+     sits flush under the navbar separated only by that margin (req: "no space … unless a margin").
+     Without this the page content (and the rail) tucked under the navbar. */
+  padding: calc(var(--navbar-height, 64px) + var(--space-3) * 2 + var(--space-4)) var(--space-5) var(--space-10);
+}
+
+/* Shops | Clips | Podcasts lane row — the BOTTOM EDGE of the composer card, not a standalone pill.
+   It sits directly BELOW the composer with a 2px seam and spans the composer's FULL width, so the
+   two read as one control surface (req: "not more than 2px space between them and taking the full
+   width as the Write Something component").
+   It mirrors the 560px composer/post-card stack exactly (same max-width + auto-centring, same
+   ≥1101px left-pin below); the toggle itself is width:100% of this box, so there is nothing left to
+   justify — hence no justify-content here. The bottom margin is the gap to the first post card. */
+.trade-page__toggle-row {
+  display: flex;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto var(--space-6);
+}
+
+/* Kill the composer's own bottom margin ONLY where the toggle follows it, so the pair butts together
+   at the 2px seam. Scoped to this adjacency: the composer keeps its normal spacing anywhere else
+   (e.g. the seller console), and there is no !important / no duplicated margin value to drift. */
+.trade-page__feed-col .composer {
+  margin-bottom: 2px;
+  /* Square the bottom corners against the seam — rounded corners either side of a 2px gap read as
+     two cards. The toggle squares its matching top corners (FeedKindToggle.css). */
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.trade-page__state {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: var(--space-6) 0;
+}
+
+.trade-page__state--error {
+  color: var(--color-danger, #b3261e);
+}
+
+.trade-page__geo-hint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-top: var(--space-4);
+}
+
+/* Inline actionable retry inside the always-visible feed column — the mobile/tablet path to
+   re-request precise location (the right-rail "Use my location" button is hidden <1101px). */
+.trade-page__geo-retry {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.trade-page__geo-retry:hover { filter: brightness(0.92); }
+.trade-page__geo-retry:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: 2px; }
+
+/* Sign-in gate */
+.trade-page--gate {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-10) var(--space-5);
+}
+
+.trade-page__cta {
+  display: inline-block;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-pill, 999px);
+  padding: var(--space-3) var(--space-6);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+/* Mobile: halve the horizontal gap between the feed column and the viewport edges so the cards use
+   more of a narrow screen (the desktop horizontal padding is --space-5 = 20px → 10px on mobile).
+   Vertical padding is unchanged. */
+@media (max-width: 600px) {
+  .trade-page {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
+}
+
+/* ── Trade layout row: [trending rail][feed][remaining space] ──
+ * The rail + feed live in a flex row. The rail is the FIRST child (LEFT-most), 248px, and is
+ * position:sticky (TrendingRail.css). The feed column sits immediately to its right; the row's
+ * own flex-start packing leaves the rest of the width as breathing room on the right.
+ *
+ * Below 1100px the rail hides itself (TrendingRail.css @media max-width:1100px → display:none),
+ * so this row collapses to just the feed column. We centre it there to preserve the original
+ * single-column mobile/tablet look (the feed's own max-width:560px + the centring below). */
+.trade-page__layout {
+  display: flex;
+  align-items: flex-start;        /* let the sticky rail pin to the top, not stretch the row */
+  gap: var(--space-5);
+}
+
+.trade-page__feed-col {
+  flex: 1 1 auto;
+  min-width: 0;                   /* allow the feed column to shrink instead of overflowing */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Right column: location + Sell buttons, then the short-video strip ──
+ * The THIRD child of the layout row. UNLIKE the LEFT trending rail (which is position:sticky and
+ * pins below the navbar), this column flows in normal document order so it SCROLLS with the page /
+ * middle feed. It also FILLS the remaining width (flex:1 1 auto, no fixed 248px) — the feed column
+ * is pinned to a fixed basis at ≥1101px below, so everything left over after [rail][feed] is this
+ * column's 100%. */
+.trade-page__rail-right {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* The location + Sell buttons share ONE box model so they match width AND height exactly; only the
+   fill differs (solid Sell vs outlined location). Full-width within the 248px column. */
+.trade-page__rail-btn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px var(--space-4);
+  border-radius: var(--radius-pill, 999px);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: var(--weight-semibold);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.trade-page__rail-btn--solid {
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.trade-page__rail-btn--solid:hover { filter: brightness(1.05); }
+
+.trade-page__rail-btn--ghost {
+  border: 1px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+}
+
+.trade-page__rail-btn--ghost:hover {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+/* Honest auto-widen note above the rail's video shelf: the nearby shorts came from beyond the
+   buyer's immediate radius, so we say how far (distance only — never a delivery claim). Calm
+   secondary text, matched to the rail width. */
+.trade-page__rail-note {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md, 10px);
+  background: var(--color-surface-2, rgba(0, 0, 0, 0.04));
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* <1100px: both rails hidden → centre the lone feed column (restores the pre-rail single-column
+   look). The location + Sell controls stay reachable via the navbar / /trade/sell route. */
+@media (max-width: 1100px) {
+  .trade-page__feed-col {
+    align-items: center;
+  }
+  .trade-page__rail-right {
+    display: none;
+  }
+}
+
+/* ≥1101px: the rail shows. Pin the feed column to its content width (560px — the composer + post
+   stack cap) so the layout reads [rail][feed 560px][right column fills the rest]. Fixing the feed
+   basis (instead of flex:1) hands ALL leftover width to the right column, which is what makes its
+   "Use my location"/Sell/video strip span the remaining 100%. The content's own auto-margins are
+   zeroed so the 560px stack pins flush-left within this fixed column. */
+@media (min-width: 1101px) {
+  .trade-page__feed-col {
+    flex: 0 0 560px;
+  }
+  .trade-page .product-feed__column,
+  .trade-page .composer,
+  .trade-page__toggle-row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  /* Bottom-anchored sticky right column (short-video strip + Quick Buys + Flash Sales). The column
+     is taller than the space under the navbar, so as the page scrolls it moves UP with the content
+     until its bottom — the Flash Sales prev/next nav — sits 10px above the viewport bottom, then it
+     STICKS there while the middle feed keeps scrolling independently. It stays in the flow of
+     .trade-page__layout (align-self:flex-start so it isn't stretched to the row height, which would
+     leave it no room to slide), so it RELEASES when that row ends — i.e. when the feed is exhausted
+     and the footer approaches, the whole page scrolls as one and the column never overlaps the
+     footer.
+
+     NOTE (the non-obvious part, verified empirically): `position:sticky; bottom:10px` does NOT
+     bottom-pin a sidebar taller than the viewport — it just scrolls 1:1 (the bottom-inset only
+     binds once the element bottom would rise ABOVE bottom:10, which never happens while scrolling
+     DOWN). The correct anchor is a `top` inset of `100vh − railHeight − 10px`: that sticks the
+     column's TOP that far from the viewport top, which places its BOTTOM exactly 10px above the
+     viewport bottom, and it releases at the row end. Because CSS can't know the column's live pixel
+     height, TradePage.tsx measures it with a ResizeObserver and writes it into `--rail-right-h`
+     (fallback 1200px). `overflow-x: clip` on #root is fine here — it establishes no scroll
+     container, so the sticky still resolves against the page/viewport (same as the left
+     TrendingRail). */
+  .trade-page__rail-right {
+    position: sticky;
+    top: calc(100vh - var(--rail-right-h, 1200px) - 10px);
+    align-self: flex-start;
+  }
+}

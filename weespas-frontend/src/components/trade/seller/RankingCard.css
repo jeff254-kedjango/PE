@@ -1,0 +1,208 @@
+/* RankingCard — LEFT column of /trade/sell. Tone matches SellerDashboard (calm admin,
+ * not the social feed). The rank number is the visual anchor: it's much larger than any
+ * other type on the card, black-weight, and centred; everything else sits underneath in the
+ * secondary hierarchy. */
+
+.ranking-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+  padding: var(--space-4, 16px);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--color-surface, #ffffff);
+}
+
+.ranking-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2, 8px);
+}
+
+.ranking-card__title {
+  font-size: var(--fs-md, 16px);
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text-strong, #111827);
+}
+
+.ranking-card__hint {
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+.ranking-card__body {
+  min-height: 140px;   /* reserve space so loading/error/paywall/rank swaps don't jitter */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ranking-card__state {
+  margin: 0;
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--fs-sm, 14px);
+  text-align: center;
+}
+
+.ranking-card__state--error {
+  color: var(--color-danger, #b91c1c);
+}
+
+/* --- happy-path body --- */
+
+.ranking-card__rank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3, 12px);
+}
+
+.ranking-card__rank-num {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  line-height: 1;
+  color: var(--color-text-strong, #111827);
+}
+
+.ranking-card__rank-hash {
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.ranking-card__rank-value {
+  font-size: 64px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ranking-card__rank-caption {
+  margin: 0;
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--fs-sm, 14px);
+  text-align: center;
+}
+
+.ranking-card__signals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2, 8px) var(--space-4, 16px);
+  margin: var(--space-2, 8px) 0 0;
+  width: 100%;
+}
+
+.ranking-card__signal {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ranking-card__signal dt {
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+  margin: 0;
+}
+
+.ranking-card__signal dd {
+  font-size: var(--fs-sm, 14px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+  margin: 0;
+}
+
+/* --- paywall body --- */
+
+.ranking-card__paywall {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+  align-items: stretch;
+  text-align: center;
+}
+
+.ranking-card__paywall-lead {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+}
+
+.ranking-card__paywall-sub {
+  margin: 0;
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--fs-sm, 14px);
+}
+
+.ranking-card__paywall-cta {
+  display: flex;
+  gap: var(--space-2, 8px);
+  justify-content: center;
+  margin-top: var(--space-2, 8px);
+}
+
+.ranking-card__cta-btn {
+  flex: 1;
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text-strong, #111827);
+  font-size: var(--fs-sm, 14px);
+  cursor: pointer;
+}
+
+.ranking-card__cta-btn:hover {
+  border-color: var(--color-primary, #2563eb);
+}
+
+.ranking-card__cta-btn[aria-pressed='true'] {
+  border-color: var(--color-primary, #2563eb);
+  background: var(--color-primary-soft, #eff6ff);
+}
+
+.ranking-card__paywall-nudge {
+  margin: var(--space-2, 8px) 0 0;
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+/* --- empty (no shop) body --- */
+
+.ranking-card__empty {
+  text-align: center;
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--fs-sm, 14px);
+}
+
+/* --- radius picker --- */
+
+.ranking-card__radius {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  padding-top: var(--space-3, 12px);
+}
+
+.ranking-card__radius-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  font-size: var(--fs-sm, 14px);
+  color: var(--color-text, #374151);
+}
+
+.ranking-card__radius-label strong {
+  color: var(--color-text-strong, #111827);
+}
+
+.ranking-card__paywall-hint {
+  color: var(--color-warning, #b45309);
+  font-size: var(--fs-xs, 12px);
+}
+
+.ranking-card__radius input[type='range'] {
+  width: 100%;
+}

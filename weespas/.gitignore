@@ -1,0 +1,102 @@
+# Weespas Backend - Git Ignore
+
+## Environment & Configuration
+.env
+.env.local
+.env.*.local
+config.local.*
+
+## Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+## Virtual Environments
+venv/
+ENV/
+env/
+.venv
+
+## IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+## Database
+*.db
+*.sqlite
+*.sqlite3
+weespas.db
+weespas.db.backup
+*.sql
+
+## Logs
+logs/
+*.log
+*.log.*
+
+## OS
+.DS_Store
+Thumbs.db
+*.tmp
+
+## Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+## Dependencies Lock Files (optional)
+# Uncomment if using lock files
+# poetry.lock
+# Pipfile.lock
+
+## Temporary Files
+tmp/
+temp/
+*.tmp
+*.bak
+
+## Media Cache
+cache/
+media_cache/
+
+## Backup Files
+*.backup
+*.bkp
+~*
+
+## Docker (if applicable)
+.dockerignore
+
+## Environment Specific
+secrets/
+credentials/
+
+# IDE specific
+.mypy_cache/
+.dmypy.json
+dmypy.json

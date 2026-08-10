@@ -1,0 +1,235 @@
+/* ==========================================================================
+   FLASH SALES — §8 Trade right-rail nationwide "crazy offer" grid.
+
+   Sits in .trade-page__rail-right directly below Quick Buys. A titled section (title + a static
+   "expires in less than an hour" subtitle), a 3-column × 2-row grid of compact offer cards, and
+   prev/next page nav (bottom-right, matching Quick Buys / the shorts shelf). Inherits the rail's
+   responsive hide (<1101px) from TradePage.css — no media query needed here.
+   ========================================================================== */
+
+.flash-sales {
+  margin-top: var(--space-4, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.flash-sales__header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.flash-sales__title {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--weight-bold, 700);
+  color: var(--color-text, #1a1a1a);
+}
+
+/* The lightning glyph carries the flash-sale urgency accent. */
+.flash-sales__title svg { color: var(--color-warning, #d97706); }
+
+.flash-sales__subtitle {
+  margin: 0;
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-secondary, #6b7280);
+}
+
+/* 3 columns × 2 rows (page_size = 6). Fixed 3 columns so the grid reads as the requested 3-wide
+   layout regardless of card count on the last page. */
+.flash-sales__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2, 8px);
+}
+
+/* ── Chunk 1: empty-state visuals ────────────────────────────────────────
+   Six 1:1 shimmer tiles matching the real .flash-sale-card__thumb aspect-ratio, so the section
+   height is stable across loading → data-arrives. Uses the shared `.skeleton` class from
+   styles/animations.css (global reduced-motion guard in styles/reset.css).
+   ---------------------------------------------------------------------- */
+.flash-sales__tile-skeleton {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: var(--radius-sm, 6px);
+}
+
+.flash-sales__empty {
+  margin: 0;
+  padding: var(--space-3, 12px) 0;
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-secondary, #6b7280);
+  text-align: center;
+}
+
+/* --- Card --- */
+.flash-sale-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(217, 119, 6, 0.20);  /* a warm flash-sale hairline */
+  border-radius: var(--radius-sm, 6px);
+  background: #fff;
+  cursor: pointer;
+  min-width: 0;  /* let children truncate inside the grid track */
+  transition: border-color var(--duration-fast, 150ms) var(--ease-out, ease),
+    box-shadow var(--duration-fast, 150ms) var(--ease-out, ease);
+}
+
+.flash-sale-card:hover {
+  border-color: rgba(217, 119, 6, 0.45);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.flash-sale-card__thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-sm, 6px);
+  overflow: hidden;
+  background: var(--color-surface-sunken, #f3f4f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flash-sale-card__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.flash-sale-card__thumb-fallback {
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--weight-bold, 700);
+  color: var(--color-text-tertiary, #9ca3af);
+}
+
+/* Craziness badge — the % off, over the top-left of the thumbnail. */
+.flash-sale-card__badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 5px 1px 3px;
+  border-radius: var(--radius-full, 9999px);
+  background: var(--color-warning, #d97706);
+  color: #fff;
+  font-size: 0.625rem;   /* 10px caption */
+  font-weight: var(--weight-bold, 700);
+  line-height: 1.4;
+}
+
+.flash-sale-card__body { min-width: 0; }
+
+.flash-sale-card__title {
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--weight-semibold, 600);
+  color: var(--color-text, #1a1a1a);
+  line-height: 1.2;
+  /* One-line truncation — the grid track is narrow. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flash-sale-card__meta {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+  /* In the narrowest rail track the flash price + struck reference can't always share a line; wrap
+     the subordinate reference below rather than overflow the grid track (h-scroll bug). */
+  flex-wrap: wrap;
+}
+
+.flash-sale-card__price {
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--weight-bold, 700);
+  color: var(--color-warning-dark, #b45309);  /* the deal price stands out */
+  white-space: nowrap;
+}
+
+/* The comparable "normal" price, struck through beside the flash price. */
+.flash-sale-card__ref {
+  font-size: 0.6875rem; /* 11px — a subordinate caption */
+  color: var(--color-text-tertiary, #9ca3af);
+  text-decoration: line-through;
+  white-space: nowrap;
+}
+
+/* Buy-now action. Full width under the body, compact. */
+.flash-sale-card__buy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  padding: 4px 6px;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-primary, #022c22);
+  color: var(--color-text-inverse, #fff);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-semibold, 600);
+  cursor: pointer;
+  transition: background var(--duration-fast, 150ms) var(--ease-out, ease),
+    opacity var(--duration-fast, 150ms) var(--ease-out, ease);
+}
+
+.flash-sale-card__buy:hover:not(:disabled) { background: var(--color-primary-light, #064e3b); }
+.flash-sale-card__buy:disabled { cursor: default; }
+
+/* Placed = success (green); error = a warning tint; placing = dimmed. */
+.flash-sale-card__buy--placed { background: var(--color-success, #059669); opacity: 0.95; }
+.flash-sale-card__buy--placing { opacity: 0.7; }
+.flash-sale-card__buy--error { background: var(--color-danger, #b91c1c); }
+
+.flash-sale-card__buy-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- Page nav (bottom-right, mirrors Quick Buys) --- */
+.flash-sales__nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: var(--space-1, 4px);
+}
+
+.flash-sales__page {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-secondary, #6b7280);
+  margin-right: auto;  /* page counter sits left, chevrons stay right */
+}
+
+.flash-sales__nav-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid rgba(2, 44, 34, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-text, #1a1a1a);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform var(--duration-fast, 150ms) var(--ease-out, ease),
+    background var(--duration-fast, 150ms) var(--ease-out, ease),
+    opacity var(--duration-fast, 150ms) var(--ease-out, ease);
+}
+
+.flash-sales__nav-btn:hover:not(:disabled) { background: #fff; transform: translateY(-1px); }
+.flash-sales__nav-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }

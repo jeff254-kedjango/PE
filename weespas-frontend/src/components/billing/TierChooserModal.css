@@ -1,0 +1,173 @@
+/* src/components/billing/TierChooserModal.css
+   Bespoke backdrop at --z-nested-modal (550) so the payment chooser always renders
+   ABOVE an already-open property-details panel (--z-modal, 500) — the reveal
+   flow is launched from inside that panel (Favourites / Related / Agents). Below
+   --z-toast (600) so confirmation toasts stay visible. */
+
+.tier-chooser-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-nested-modal, 550);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: tier-overlay-fade var(--duration-fast, 160ms) var(--ease-out, ease-out);
+}
+
+@keyframes tier-overlay-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (min-width: 640px) {
+  .tier-chooser-overlay { align-items: center; }
+}
+
+.tier-chooser {
+  position: relative;
+  width: min(440px, calc(100vw - 32px));
+  background: var(--color-bg-white, #fff);
+  border-radius: 18px;
+  padding: 28px 24px 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  animation: tier-chooser-in 180ms ease-out;
+}
+
+@keyframes tier-chooser-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.tier-chooser__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  border: none;
+  background: var(--color-surface, #f1f3f5);
+  color: var(--color-text-secondary, #555);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.tier-chooser__close:hover { background: var(--color-border, #e2e5e9); }
+
+.tier-chooser__head { text-align: center; margin-bottom: 18px; }
+
+.tier-chooser__icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--color-accent-muted, #e8f0ff);
+  color: var(--color-accent, #2f6bff);
+}
+
+.tier-chooser__title {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text, #16181d);
+}
+
+.tier-chooser__sub {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--color-text-secondary, #5a6069);
+}
+
+/* Status panel (initiating / pending / failed) */
+.tier-chooser__status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+.tier-chooser__status--initiating,
+.tier-chooser__status--pending {
+  background: var(--color-accent-muted, #e8f0ff);
+  color: var(--color-primary-dark, #1d4ed8);
+}
+.tier-chooser__status--failed {
+  background: #fdecec;
+  color: var(--color-error, #c0392b);
+}
+
+.tier-chooser__spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: tier-spin 0.7s linear infinite;
+  flex: 0 0 auto;
+}
+@keyframes tier-spin { to { transform: rotate(360deg); } }
+
+/* Tier ladder */
+.tier-chooser__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.tier-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 8px;
+  border: 1.5px solid var(--color-border, #e2e5e9);
+  border-radius: 14px;
+  background: var(--color-bg-white, #fff);
+  cursor: pointer;
+  transition: border-color 120ms, transform 120ms, box-shadow 120ms;
+}
+.tier-card:hover {
+  border-color: var(--color-accent, #2f6bff);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(47, 107, 255, 0.16);
+}
+
+.tier-card__price {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-text, #16181d);
+}
+.tier-card__locations {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-accent, #2f6bff);
+}
+.tier-card__window {
+  font-size: 0.74rem;
+  color: var(--color-text-tertiary, #868d96);
+}
+
+.tier-chooser__cancel {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary, #5a6069);
+  font-size: 0.9rem;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.tier-chooser__cancel:hover { background: var(--color-surface, #f1f3f5); }
+
+@media (max-width: 380px) {
+  .tier-chooser__grid { grid-template-columns: 1fr; }
+  .tier-card { flex-direction: row; justify-content: space-between; padding: 14px 16px; }
+}

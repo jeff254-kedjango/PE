@@ -1,0 +1,321 @@
+/* ==========================================================================
+   PRODUCT CARD — one post in the SOCIAL Trade feed (FB/X/LinkedIn hybrid).
+   A single-column, media-led post with a seller header + engagement bar.
+   (The shop/storefront stays a traditional catalogue — see Storefront.css.)
+   ========================================================================== */
+
+.product-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  background: var(--color-bg-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(2, 44, 34, 0.08);
+  box-shadow: var(--shadow-card);
+  width: 100%;
+  font-family: var(--font-body);
+  overflow: hidden;
+  transition: box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.product-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* A sponsored post carries a subtle accent border in addition to its explicit "Boosted" label
+   (the label is the contract; this is reinforcement). */
+.product-card--sponsored {
+  border-color: var(--color-accent, #c08a2d);
+}
+
+/* ── Header: seller identity ── */
+.product-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+}
+
+.product-card__seller {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.product-card__avatar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full, 999px);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: var(--color-text-inverse);
+  font-weight: var(--weight-bold);
+  font-size: 1.1rem;
+}
+
+.product-card__seller-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* The meta row is now its own button (the avatar beside it is the hovercard trigger). Reset the
+   native button chrome so it reads as the plain text block it replaced. */
+.product-card__seller-meta--btn {
+  align-items: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+/* Shop name — the social header's primary identity line. Truncates rather than wrapping so a long
+   shop name can't push the header height around. */
+.product-card__shop-name {
+  font-size: 0.9rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-card__seller-line {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.product-card__distance {
+  white-space: nowrap;
+}
+
+/* Boosted label / Selling-now pill — top-right of the header. */
+.product-card__boosted,
+.product-card__selling-now {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill, 999px);
+  font-size: 0.7rem;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.02em;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.2));
+}
+
+.product-card__boosted {
+  background: var(--color-accent, #c08a2d);
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.product-card__selling-now {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--weight-semibold);
+}
+
+/* ── Media (large, social) ── */
+/* Wrapper around the carousel so the absolutely-positioned "Video" badge anchors to the media. */
+.product-card__media-wrap {
+  position: relative;
+}
+
+/* The no-media fallback tile (a product with no photos ⇒ its title initial on the brand gradient).
+   No image to measure, so it keeps a neutral square — it just needs to read like a card's media
+   slot, not fill a real photo's role. Real media renders through .media-carousel (true aspect
+   ratio, viewport-capped); this tile is only the headless-card fallback. */
+.product-card__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.product-card__media-fallback {
+  color: var(--color-text-inverse);
+  font-size: 3rem;
+  font-weight: var(--weight-bold);
+}
+
+/* "Video" badge — marks a seller's declared short-video post (§8 guide-the-user). */
+.product-card__video-badge {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill, 999px);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: var(--weight-semibold);
+}
+
+/* ── Caption: title + price ── */
+.product-card__caption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) var(--space-2);
+}
+
+.product-card__caption-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.product-card__caption h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: var(--weight-semibold);
+  line-height: 1.35;
+  color: var(--color-text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-card__price {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  font-weight: var(--weight-bold);
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+/* ── Description (paragraph-aware, with read-more) ── */
+.product-card__desc {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* A plain post's body is the card's main content — primary text, slightly larger than a product's
+   secondary description blurb. Shares .product-card__desc-p for paragraph spacing. */
+.product-card__post-body {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+}
+
+.product-card__desc-p {
+  margin: 0 0 var(--space-2);
+  white-space: pre-line; /* belt-and-braces: honour any newlines that slip through as text */
+}
+
+.product-card__desc-p:last-child {
+  margin-bottom: 0;
+}
+
+/* The "read more / show less" affordance — a plain inline text button, NOT a link. */
+.product-card__readmore {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.product-card__readmore:hover {
+  text-decoration: underline;
+}
+
+/* ── Engagement bar ── */
+.product-card__engage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid rgba(2, 44, 34, 0.07);
+}
+
+.product-card__action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--space-2);
+  background: none;
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.product-card__action:hover:not(:disabled) {
+  background: rgba(2, 44, 34, 0.05);
+  color: var(--color-text-primary);
+}
+
+.product-card__action:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* Active state (asked / comments-open) — accent the toggle. */
+.product-card__action--on {
+  color: var(--color-accent, #c08a2d);
+}
+
+/* The "Save"/love toggle is a HEART — it must read RED when active, consistent with every other
+   heart across the app (property favourites, shorts, comment likes), NOT the lime accent. The
+   colour fade comes from the base .product-card__action `color` transition. The `:hover` variant
+   is listed explicitly so the active red also wins over `.product-card__action:hover` (which sets
+   `color`); without it, an active heart reverts to the hover colour while the pointer rests on it. */
+.product-card__action--like.product-card__action--on,
+.product-card__action--like.product-card__action--on:hover:not(:disabled) {
+  color: var(--color-heart);
+}
+
+/* The "Ask" inquiry toggle reads CYAN once sent (a distinct "message dispatched" signal, separate
+   from the red love and the lime open/active state). Same `:hover` guard as the heart. The button
+   becomes `disabled` when asked (one inquiry per card), so the cyan shows through the disabled dim. */
+.product-card__action--ask.product-card__action--on,
+.product-card__action--ask.product-card__action--on:hover:not(:disabled) {
+  color: var(--color-cyan);
+}
+
+.product-card__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--color-accent, #c08a2d);
+  font-weight: var(--weight-semibold);
+  font-size: 0.78rem;
+}
+
+.product-card__rating-count {
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-regular, 400);
+}

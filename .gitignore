@@ -1,0 +1,72 @@
+# =============================================================================
+# Root .gitignore for the PE monorepo.
+#
+# Nested .gitignores (InSAR-Final-main/, weespas/, weespas-frontend/, dev/keys/)
+# still apply on top of this file. This one exists because PE previously sat
+# inside a home-directory git repo and inherited that repo's ignore rules; as a
+# standalone repo it needs its own baseline.
+#
+# Rule of thumb: secrets, user data, build output, and geospatial rasters never
+# land here. .env.example files are the documented contract and DO get tracked.
+# =============================================================================
+
+# --- Secrets (defense-in-depth; nested .gitignores also cover these) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+dev/dev.env
+secrets/
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+htmlcov/
+
+# --- Node / frontend ---
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# --- User-uploaded runtime media (user data, not source) ---
+weespas/uploads/
+uploads/
+
+# --- Database dumps & backups (contain user data + credentials) ---
+backup_*.sql
+*.dump
+*.sql.gz
+**/backup_*.sql
+
+# --- Geospatial / InSAR heavy artefacts (GitHub rejects >100MB) ---
+*.duckdb
+*.pmtiles
+*.tif
+*.tiff
+*.h5
+*.nc
+
+# --- Logs & scratch ---
+*.log
+*.out
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*.swp
+*~
+*:Zone.Identifier

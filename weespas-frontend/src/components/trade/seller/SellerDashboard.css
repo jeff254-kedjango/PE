@@ -1,0 +1,256 @@
+/* ==========================================================================
+   SELLER DASHBOARD — traditional admin layout (NOT social). Shops → listings.
+   ========================================================================== */
+
+.seller-dash {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.seller-dash__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.seller-dash__rating {
+  font-weight: var(--weight-semibold);
+  color: var(--color-accent, #c08a2d);
+}
+
+.seller-dash__rating em {
+  font-style: normal;
+  color: var(--color-text-secondary);
+}
+
+.seller-dash__state,
+.seller-dash__empty {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  color: var(--color-text-secondary);
+}
+
+.seller-dash__state--error { color: var(--color-danger, #b3261e); }
+
+.seller-dash__empty {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: center;
+}
+
+.seller-dash__empty h2 {
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+/* ── Shop block ── */
+.seller-dash__shop {
+  border: 1px solid rgba(2, 44, 34, 0.08);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-white, #fff);
+  overflow: hidden;
+}
+
+.seller-dash__shop-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid rgba(2, 44, 34, 0.07);
+}
+
+.seller-dash__shop-head h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.seller-dash__shop-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.seller-dash__shop-empty {
+  padding: var(--space-5);
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+/* ── Listing rows ── */
+.seller-dash__listings {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.seller-dash__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid rgba(2, 44, 34, 0.05);
+}
+
+.seller-dash__row:last-child { border-bottom: none; }
+
+.seller-dash__thumb {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: var(--color-text-inverse);
+  font-weight: var(--weight-bold);
+}
+
+.seller-dash__thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.seller-dash__vbadge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 0.6rem;
+  padding: 1px 4px;
+  border-radius: var(--radius-pill, 999px);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+}
+
+.seller-dash__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.seller-dash__title {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-dash__sub {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+}
+
+.seller-dash__promo {
+  font-style: normal;
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
+}
+
+.seller-dash__stock {
+  font-size: 0.74rem;
+  font-weight: var(--weight-semibold);
+  width: fit-content;
+}
+
+.seller-dash__stock--is-ok { color: var(--color-success, #2e7d32); }
+.seller-dash__stock--is-low { color: var(--color-accent, #c08a2d); }
+.seller-dash__stock--is-out { color: var(--color-danger, #b3261e); }
+
+/* ── Row actions (POS + reach) ── */
+.seller-dash__row-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.seller-dash__reach {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.seller-dash__reach-btn {
+  padding: 4px 12px;
+  border: 1px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+  border-radius: var(--radius-pill, 999px);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.seller-dash__reach-btn:hover { background: rgba(2, 44, 34, 0.06); }
+
+/* ── Stock control (inline POS) ── */
+.stock-control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.stock-control__step {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(2, 44, 34, 0.18);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-bg-white, #fff);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-primary);
+}
+
+.stock-control__step:disabled { opacity: 0.4; cursor: default; }
+
+.stock-control__count {
+  min-width: 26px;
+  text-align: center;
+  font-weight: var(--weight-semibold);
+}
+
+.stock-control__set {
+  display: flex;
+  gap: 4px;
+}
+
+.stock-control__set input {
+  width: 56px;
+  padding: 4px 6px;
+  border: 1px solid rgba(2, 44, 34, 0.18);
+  border-radius: var(--radius-md, 8px);
+  font-family: inherit;
+  font-size: 0.82rem;
+}
+
+.stock-control__set button {
+  padding: 4px 10px;
+  border: 1px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+  border-radius: var(--radius-md, 8px);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.stock-control__set button:disabled { opacity: 0.5; cursor: default; }
+
+@media (max-width: 560px) {
+  .seller-dash__row { flex-wrap: wrap; }
+  .seller-dash__row-actions { width: 100%; flex-wrap: wrap; justify-content: flex-start; }
+  .stock-control { justify-content: flex-start; }
+}

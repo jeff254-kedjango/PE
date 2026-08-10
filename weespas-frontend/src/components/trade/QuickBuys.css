@@ -1,0 +1,227 @@
+/* ==========================================================================
+   QUICK BUYS — §8 Trade right-rail 3×3 discovery grid.
+
+   Sits in .trade-page__rail-right below the ShopVideoStrip. A titled section with a filter button
+   (far right of the header), a 3-column grid of compact product cards, and prev/next page nav
+   (bottom-right, matching the shorts shelf's chevron nav). Inherits the rail's responsive hide
+   (<1101px) from TradePage.css — no media query needed here.
+   ========================================================================== */
+
+.quick-buys {
+  margin-top: var(--space-4, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.quick-buys__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;  /* title left, filter icon far right (per the design) */
+  gap: var(--space-2, 8px);
+}
+
+.quick-buys__title {
+  margin: 0;
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--weight-bold, 700);
+  color: var(--color-text, #1a1a1a);
+}
+
+.quick-buys__filter-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid rgba(2, 44, 34, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-text, #1a1a1a);
+  cursor: pointer;
+  transition: background var(--duration-fast, 150ms) var(--ease-out, ease),
+    transform var(--duration-fast, 150ms) var(--ease-out, ease);
+}
+
+.quick-buys__filter-btn:hover { background: #fff; transform: translateY(-1px); }
+.quick-buys__filter-btn.is-active {
+  /* A dot of primary tint marks that a filter is applied. */
+  border-color: var(--color-primary, #022c22);
+  color: var(--color-primary, #022c22);
+}
+
+/* 3 columns × up to 3 rows (page_size = 9). Fixed 3 columns so the grid reads as the requested
+   3-wide layout regardless of card count on the last page. */
+.quick-buys__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2, 8px);
+}
+
+.quick-buys__empty {
+  margin: 0;
+  padding: var(--space-3, 12px) 0;
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-secondary, #6b7280);
+  text-align: center;
+}
+
+/* ── Chunk 1: skeleton tiles ─────────────────────────────────────────────
+   Nine 1:1 shimmer tiles matching the real .quick-buy-card__thumb aspect-ratio, so the section's
+   height is identical before and after data lands (no reflow when the fetch resolves).
+   ---------------------------------------------------------------------- */
+.quick-buys__tile-skeleton {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: var(--radius-sm, 6px);
+}
+
+/* --- Card --- */
+.quick-buy-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(2, 44, 34, 0.08);
+  border-radius: var(--radius-sm, 6px);
+  background: #fff;
+  cursor: pointer;
+  min-width: 0;  /* let children truncate inside the grid track */
+  transition: border-color var(--duration-fast, 150ms) var(--ease-out, ease),
+    box-shadow var(--duration-fast, 150ms) var(--ease-out, ease);
+}
+
+.quick-buy-card:hover {
+  border-color: rgba(2, 44, 34, 0.18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.quick-buy-card__thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-sm, 6px);
+  overflow: hidden;
+  background: var(--color-surface-sunken, #f3f4f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-buy-card__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.quick-buy-card__thumb-fallback {
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--weight-bold, 700);
+  color: var(--color-text-tertiary, #9ca3af);
+}
+
+.quick-buy-card__body { min-width: 0; }
+
+.quick-buy-card__title {
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--weight-semibold, 600);
+  color: var(--color-text, #1a1a1a);
+  line-height: 1.2;
+  /* One-line truncation — the grid track is narrow. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quick-buy-card__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px;
+  min-width: 0;
+  /* In the narrowest rail track (~63px at the 1101px breakpoint) the price + distance can't share a
+     line; wrap the subordinate distance below rather than overflow the grid track (h-scroll bug). */
+  flex-wrap: wrap;
+}
+
+.quick-buy-card__price {
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--weight-bold, 700);
+  color: var(--color-primary, #022c22);
+  white-space: nowrap;
+}
+
+.quick-buy-card__dist {
+  font-size: 0.6875rem; /* 11px — a subordinate caption */
+  color: var(--color-text-tertiary, #9ca3af);
+  white-space: nowrap;
+}
+
+/* Add-to-cart / buy-now action. Full width under the body, compact. */
+.quick-buy-card__cart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  padding: 4px 6px;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-primary, #022c22);
+  color: var(--color-text-inverse, #fff);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-semibold, 600);
+  cursor: pointer;
+  transition: background var(--duration-fast, 150ms) var(--ease-out, ease),
+    opacity var(--duration-fast, 150ms) var(--ease-out, ease);
+}
+
+.quick-buy-card__cart:hover:not(:disabled) { background: var(--color-primary-light, #064e3b); }
+.quick-buy-card__cart:disabled { cursor: default; }
+
+/* Placed = success (green check state); error = a muted warning tint; placing = dimmed. */
+.quick-buy-card__cart--placed { background: var(--color-success, #059669); opacity: 0.95; }
+.quick-buy-card__cart--placing { opacity: 0.7; }
+.quick-buy-card__cart--error { background: var(--color-danger, #b91c1c); }
+
+.quick-buy-card__cart-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- Page nav (bottom-right, mirrors ShortsShelf nav) --- */
+.quick-buys__nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: var(--space-1, 4px);
+}
+
+.quick-buys__page {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-secondary, #6b7280);
+  margin-right: auto;  /* page counter sits left, chevrons stay right */
+}
+
+.quick-buys__nav-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid rgba(2, 44, 34, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-text, #1a1a1a);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform var(--duration-fast, 150ms) var(--ease-out, ease),
+    background var(--duration-fast, 150ms) var(--ease-out, ease),
+    opacity var(--duration-fast, 150ms) var(--ease-out, ease);
+}
+
+.quick-buys__nav-btn:hover:not(:disabled) { background: #fff; transform: translateY(-1px); }
+.quick-buys__nav-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }

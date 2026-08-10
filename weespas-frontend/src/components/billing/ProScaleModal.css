@@ -1,0 +1,172 @@
+/* src/components/billing/ProScaleModal.css
+   The §8 soft-gate modal. Shares TierChooserModal's backdrop/sheet design language so
+   the two billing surfaces feel like one family. Sits at --z-nested-modal (550) like the
+   chooser, below --z-toast (600). */
+
+.proscale-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-nested-modal, 550);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: proscale-overlay-fade var(--duration-fast, 160ms) var(--ease-out, ease-out);
+}
+
+@keyframes proscale-overlay-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (min-width: 640px) {
+  .proscale-overlay { align-items: center; }
+}
+
+.proscale {
+  position: relative;
+  width: min(460px, calc(100vw - 32px));
+  background: var(--color-bg-white, #fff);
+  border-radius: 18px;
+  padding: 28px 24px 18px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  animation: proscale-in 180ms ease-out;
+}
+
+@keyframes proscale-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.proscale__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  border: none;
+  background: var(--color-surface, #f1f3f5);
+  color: var(--color-text-secondary, #555);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.proscale__close:hover { background: var(--color-border, #e2e5e9); }
+
+.proscale__head { text-align: center; margin-bottom: 16px; }
+
+.proscale__icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--color-accent-muted, #e8f0ff);
+  color: var(--color-accent, #2f6bff);
+}
+
+.proscale__title {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--color-text, #16181d);
+}
+
+.proscale__sub {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary, #5a6069);
+}
+
+/* "What we noticed" — transparency chips, so the ask isn't a black box. */
+.proscale__signals {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: var(--color-surface, #f6f8fa);
+  border-radius: 12px;
+}
+.proscale__signal {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary-dark, #1d4ed8);
+}
+
+.proscale__status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  margin-bottom: 14px;
+}
+.proscale__status--sent {
+  background: #e7f7ed;
+  color: #1c7d46;
+}
+.proscale__status--failed {
+  background: #fdecec;
+  color: var(--color-error, #c0392b);
+}
+
+.proscale__cta {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  background: var(--color-accent, #2f6bff);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 13px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: opacity 120ms, transform 120ms;
+}
+.proscale__cta:hover { opacity: 0.92; transform: translateY(-1px); }
+.proscale__cta:disabled { opacity: 0.7; cursor: progress; transform: none; }
+
+.proscale__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: proscale-spin 0.7s linear infinite;
+  flex: 0 0 auto;
+}
+@keyframes proscale-spin { to { transform: rotate(360deg); } }
+
+.proscale__dismiss {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary, #5a6069);
+  font-size: 0.9rem;
+  padding: 10px 8px 4px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.proscale__dismiss:hover { color: var(--color-text, #16181d); }
+
+.proscale__fineprint {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--color-text-tertiary, #868d96);
+}

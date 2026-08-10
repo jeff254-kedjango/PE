@@ -1,0 +1,86 @@
+/* BulkStockUpload — sits on the SellerDashboard (RIGHT column) between the header row and
+   the shop list. Deliberately dense — a single narrow strip, not a full-height card. */
+
+.bulk-stock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--color-surface-alt, #f9fafb);
+  margin-bottom: var(--space-4, 16px);
+}
+
+.bulk-stock__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bulk-stock__title {
+  margin: 0;
+  font-size: var(--fs-sm, 14px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+}
+
+.bulk-stock__help {
+  margin: 0;
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+.bulk-stock__help code {
+  background: var(--color-border-subtle, #f3f4f6);
+  padding: 0 4px;
+  border-radius: 4px;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+}
+
+.bulk-stock__inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.bulk-stock__file input {
+  font-size: var(--fs-xs, 12px);
+}
+
+.bulk-stock__textarea {
+  width: 100%;
+  padding: var(--space-2, 8px);
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: var(--fs-xs, 12px);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-md, 8px);
+  resize: vertical;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+.bulk-stock__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+}
+
+.bulk-stock__submit {
+  padding: 6px 16px;
+  font-size: var(--fs-sm, 14px);
+  font-weight: 600;
+  background: var(--color-primary, #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+}
+.bulk-stock__submit:disabled { opacity: 0.6; cursor: default; }
+.bulk-stock__submit:hover:not(:disabled) { background: var(--color-primary-strong, #1e40af); }
+
+.bulk-stock__feedback {
+  margin: 0;
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-secondary, #6b7280);
+}

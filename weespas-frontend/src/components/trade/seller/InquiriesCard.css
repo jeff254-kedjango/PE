@@ -1,0 +1,42 @@
+/* InquiriesCard — matches the outer shape of RankingCard + ViewingCard so the LEFT column
+   reads as a stack of sibling cards. The inner inbox keeps its own styles (from
+   InquiriesInbox.css) — the card is chrome, not a restyle of the inbox rows.
+
+   The body has a bounded max-height + scroll so a shop with 50 open inquiries doesn't
+   let the card grow to the length of the page; the inbox list handles its own overflow
+   below that point. */
+
+.inquiries-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+  padding: var(--space-4, 16px);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--color-surface, #ffffff);
+}
+
+.inquiries-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2, 8px);
+}
+
+.inquiries-card__title {
+  margin: 0;
+  font-size: var(--fs-md, 16px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+}
+
+.inquiries-card__unread {
+  font-size: var(--fs-sm, 14px);
+  font-weight: 500;
+  color: var(--color-primary, #2563eb);
+}
+
+.inquiries-card__body {
+  max-height: 360px;
+  overflow-y: auto;
+}

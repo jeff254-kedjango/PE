@@ -1,0 +1,236 @@
+/* ==========================================================================
+   HERO — 100vh white landing with ambient animation background
+   z-index layers: 0 bg | 1 animation | 2 content + search + scroll hint
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 540px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--color-bg-white);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: var(--shadow-hero);
+  margin-bottom: var(--space-12);
+}
+
+/* ── Animation Background Layer (z-index 1) ── */
+.hero__animation {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 55%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Body (info content, z-index 2) ── */
+.hero__body {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  /* The search region used to sit above the body and push it down; with the search bar removed the
+     body clears the fixed navbar itself. */
+  padding-top: calc(var(--navbar-height) + var(--space-12));
+}
+
+/* ── Info Column (left) ── */
+.hero__info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding-bottom: var(--space-6);
+  max-width: 560px;
+}
+
+.hero__eyebrow {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent-hover);
+}
+
+.hero__title {
+  font-size: var(--text-7xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-primary);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.hero__subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  font-weight: var(--weight-semibold);
+  max-width: 540px;
+}
+
+.hero__subtitle span{
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  font-weight: var(--weight-semibold);
+  max-width: 540px;
+}
+
+/* ── Quick Stats ── */
+.hero__stats {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-top: var(--space-2);
+}
+
+.hero__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.hero__stat strong {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-accent-hover);
+}
+
+.hero__stat span {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.hero__stat-divider {
+  width: 1px;
+  height: 32px;
+  background: rgba(2, 44, 34, 0.12);
+}
+
+/* ── Scroll Hint ── */
+/* A real <button> (keyboard + a11y) reset to look like a plain hint, NOT a link: no underline,
+   no link colour, default cursor swapped for pointer only to signal it reacts. The hover state is
+   a subtle lift/darken — present but understated, so it never reads as a hyperlink. */
+.hero__scroll-hint {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3) var(--space-6);
+  margin: 0 auto;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.2s ease;
+}
+
+.hero__scroll-hint:hover .hero__scroll-text,
+.hero__scroll-hint:focus-visible .hero__scroll-text {
+  color: var(--color-text-secondary);
+}
+
+.hero__scroll-hint:hover {
+  transform: translateY(2px);
+}
+
+.hero__scroll-hint:focus {
+  outline: none;
+}
+
+.hero__scroll-hint:focus-visible {
+  outline: 2px solid var(--color-text-tertiary);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.hero__scroll-text {
+  font-size: 11px;
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  transition: color 0.2s ease;
+}
+
+.hero__scroll-line {
+  width: 1px;
+  height: 28px;
+  background: var(--color-text-tertiary);
+  opacity: 0.4;
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 0.15;
+    transform: scaleY(0.6);
+  }
+}
+
+/* ── Responsive — Tablet ── */
+@media (max-width: 768px) {
+  .hero {
+    height: 100vh;
+    min-height: 540px;
+  }
+
+  .hero__animation {
+    width: 100%;
+    opacity: 0.35;
+  }
+
+  .hero__body {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .hero__info {
+    align-items: center;
+  }
+
+  .hero__title {
+    font-size: var(--text-3xl);
+  }
+
+  .hero__subtitle {
+    font-size: var(--text-base);
+  }
+
+  .hero__stats {
+    gap: var(--space-4);
+  }
+
+  .hero__stat strong {
+    font-size: var(--text-xl);
+  }
+}
+
+/* ── Responsive — Small Mobile ── */
+@media (max-width: 480px) {
+  .hero__title {
+    font-size: var(--text-2xl);
+  }
+}

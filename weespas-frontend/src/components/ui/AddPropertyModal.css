@@ -1,0 +1,424 @@
+/* ==========================================================================
+   ADD PROPERTY MODAL
+   Extends the adv-modal pattern from AdvancedSearchModal.
+   Only new/overridden styles live here — all base modal, section, row,
+   field, toggle-chip, header, footer, and overlay classes are reused.
+   Rendered via React portal to document.body to escape stacking contexts.
+   ========================================================================== */
+
+/* ── Full-width field (title, description, location_name) ── */
+.prop-field--full {
+  grid-column: 1 / -1;
+}
+
+/* ── Row spacing — consecutive rows need a gap ── */
+.prop-row-gap {
+  margin-top: var(--space-3);
+}
+
+/* ── Required asterisk ── */
+.prop-required {
+  color: var(--color-error);
+}
+
+/* ── Textarea ── */
+.prop-textarea {
+  width: 100%;
+  min-height: 80px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(2, 44, 34, 0.12);
+  padding: var(--space-3);
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  resize: vertical;
+  line-height: var(--leading-normal);
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.prop-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-muted);
+  background: var(--color-bg-white);
+}
+
+.prop-textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* ── Native select styling (matches adv-field input) ── */
+.prop-select {
+  width: 100%;
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(2, 44, 34, 0.12);
+  padding: 0 var(--space-3);
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  appearance: auto;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.prop-select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-muted);
+  background: var(--color-bg-white);
+}
+
+/* Placeholder-style for unselected state */
+.prop-select--empty {
+  color: var(--color-text-tertiary);
+}
+
+/* ── Inline validation error ── */
+.prop-error {
+  font-size: var(--text-xs);
+  color: var(--color-error);
+  font-weight: var(--weight-medium);
+  margin-top: 2px;
+}
+
+/* Error state on inputs/selects/textareas */
+.prop-input--error {
+  border-color: var(--color-error) !important;
+}
+
+.prop-input--error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+}
+
+/* ── "Use My Location" button — full-width in-form variant, styled locally.
+   (SearchPanel's location control is now the header-row .search-filter__locate pill.) ── */
+.prop-location-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-md);
+  min-height: 44px;
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  border: 1.5px dashed rgba(2, 44, 34, 0.2);
+  background: var(--color-bg);
+  color: var(--color-primary-light);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.prop-location-btn:hover {
+  border-color: var(--color-primary-light);
+  background: rgba(6, 78, 59, 0.04);
+}
+
+.prop-location-btn.locating {
+  border-color: var(--color-accent);
+  color: var(--color-primary);
+  animation: prop-pulse 1.2s ease-in-out infinite;
+}
+
+.prop-location-btn.located {
+  border-style: solid;
+  border-color: var(--color-success);
+  color: var(--color-success);
+  background: rgba(16, 185, 129, 0.06);
+}
+
+.prop-location-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+@keyframes prop-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ── "or" divider between location button and coordinate fields ── */
+.prop-location-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-3) 0;
+  color: var(--color-text-tertiary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.prop-location-divider::before,
+.prop-location-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(2, 44, 34, 0.08);
+}
+
+/* ── Submit button disabled state ── */
+.adv-modal__apply:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.adv-modal__apply:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Info note ── */
+.prop-note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-info);
+  background: rgba(59, 130, 246, 0.06);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-3);
+}
+
+/* ── Mobile: safe-area footer padding for bottom-nav clearance ── */
+@media (max-width: 768px) {
+  .prop-modal-footer {
+    padding-bottom: calc(var(--space-4) + var(--safe-area-bottom, 0px));
+  }
+}
+
+/* ── Media upload zone ── */
+.prop-upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1.5px dashed rgba(2, 44, 34, 0.15);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-4);
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+  background: var(--color-bg);
+  transition: border-color var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out);
+}
+
+.prop-upload-zone:hover {
+  border-color: var(--color-primary-light);
+  background: rgba(6, 78, 59, 0.03);
+  color: var(--color-primary-light);
+}
+
+.prop-upload-zone--active {
+  border-color: var(--color-accent);
+  background: rgba(191, 255, 0, 0.04);
+}
+
+.prop-upload-zone__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.prop-upload-zone__hint {
+  font-size: var(--text-xs);
+}
+
+/* Hidden file input */
+.prop-upload-input {
+  display: none;
+}
+
+/* ── Image preview grid ── */
+.prop-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.prop-preview-item {
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: var(--color-bg-elevated);
+  border: 1px solid rgba(2, 44, 34, 0.08);
+}
+
+.prop-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.prop-preview-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.prop-preview-item:hover .prop-preview-remove {
+  opacity: 1;
+}
+
+/* Touch devices: always show remove button */
+@media (hover: none) {
+  .prop-preview-remove {
+    opacity: 1;
+  }
+}
+
+/* ── Video preview ── */
+.prop-video-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  border: 1px solid rgba(2, 44, 34, 0.08);
+  margin-top: var(--space-3);
+}
+
+.prop-video-preview__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.prop-video-preview__name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prop-video-preview__size {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.prop-video-remove {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: 1px solid rgba(2, 44, 34, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  transition: color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+}
+
+.prop-video-remove:hover {
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+/* ── Upload progress bar ── */
+.prop-upload-progress {
+  margin-top: var(--space-3);
+}
+
+.prop-upload-progress__label {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-1);
+}
+
+.prop-upload-progress__bar {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(2, 44, 34, 0.08);
+  overflow: hidden;
+}
+
+.prop-upload-progress__fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* ── Media section subsection labels ── */
+.prop-media-label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-2);
+}
+
+.prop-media-label:not(:first-child) {
+  margin-top: var(--space-4);
+}
+
+/* ── Edit modal extras (inline undo link + footer progress label) ── */
+.prop-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-accent);
+  font: inherit;
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.prop-link-btn:hover {
+  opacity: 0.85;
+}
+
+.prop-upload-step {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin-right: auto;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .prop-textarea,
+  .prop-select,
+  .prop-location-btn,
+  .prop-upload-zone,
+  .prop-preview-remove,
+  .prop-video-remove {
+    transition: none;
+  }
+
+  .prop-location-btn.locating {
+    animation: none;
+  }
+}

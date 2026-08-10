@@ -1,0 +1,7 @@
+# Local dev RSA keypair for the InSAR telemetry token (RS256). NEVER commit these.
+# The private key signs telemetry/bridge tokens on Weespas; the public key verifies
+# them on InSAR. Generate locally with:
+#   openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out insar_jwt_private.pem
+#   openssl rsa -in insar_jwt_private.pem -pubout -out insar_jwt_public.pem
+# Prod keys are provisioned out-of-band (secret manager / mounted file), not from here.
+*.pem

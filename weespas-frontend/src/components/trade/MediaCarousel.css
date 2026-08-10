@@ -1,0 +1,128 @@
+/* ==========================================================================
+   MEDIA CAROUSEL — one-at-a-time swipeable media for a feed card.
+   Square stage (matches the old single-image aspect), arrows + dots + count.
+   ========================================================================== */
+
+/* The media box takes the TRUE aspect ratio of the card's first slide (published via the inline
+   `--media-ratio` custom property = naturalWidth / naturalHeight; see MediaCarousel.tsx). So a
+   portrait photo reads tall and a landscape photo reads wide — nothing is cropped (the slide uses
+   object-fit: contain). We CLAMP the ratio to a sane band so a freak panorama or a sliver-thin
+   portrait can't blow the layout, and we cap the box HEIGHT at the available viewport (the space
+   left under the fixed navbar, minus breathing room) so even a tall portrait never exceeds one
+   screen. Until the first slide is measured, `--media-ratio` is unset and the var() fallback (1)
+   gives a neutral square — no flash to a wrong shape.
+
+   --nav-real ≈ the real fixed-navbar footprint (inner --navbar-height + its top/bottom padding,
+   2×--space-3); --media-vspace is the extra breathing room kept below the viewport so the card's
+   caption/engagement bar stays reachable without scrolling inside a single card. */
+.media-carousel {
+  --nav-real: calc(var(--navbar-height, 64px) + 2 * var(--space-3, 12px));
+  --media-vspace: var(--space-5, 20px);
+  --media-ratio-clamped: clamp(0.6, var(--media-ratio, 1), 1.91);
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--media-ratio-clamped);
+  max-height: calc(100vh - var(--nav-real) - var(--media-vspace));
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  overflow: hidden;
+}
+
+.media-carousel__stage {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+/* contain (NOT cover): show the WHOLE image/video in its true dimensions — never crop. A slide of a
+   different orientation than the box (e.g. a landscape sibling in a portrait-led card) letterboxes
+   against the gradient backdrop rather than being cropped. max dims keep it inside the ratio box. */
+.media-carousel__img,
+.media-carousel__video {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.media-carousel__video {
+  background: #000;
+  cursor: default;
+}
+
+.media-carousel__fallback {
+  color: var(--color-text-inverse);
+  font-size: 3rem;
+  font-weight: var(--weight-bold);
+}
+
+/* ── Prev / next arrows (desktop; on touch the swipe is primary) ── */
+.media-carousel__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: var(--radius-full, 999px);
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
+}
+
+.media-carousel:hover .media-carousel__nav { opacity: 1; }
+.media-carousel__nav:hover { background: rgba(0, 0, 0, 0.7); }
+.media-carousel__nav--prev { left: var(--space-2); }
+.media-carousel__nav--next { right: var(--space-2); }
+
+/* On touch devices (no hover) keep the arrows faintly visible so they're discoverable. */
+@media (hover: none) {
+  .media-carousel__nav { opacity: 0.85; }
+}
+
+/* ── Count pill "2/4" ── */
+.media-carousel__counter {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill, 999px);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: var(--weight-semibold);
+  pointer-events: none;
+}
+
+/* ── Dot indicators ── */
+.media-carousel__dots {
+  position: absolute;
+  bottom: var(--space-2);
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.media-carousel__dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+
+.media-carousel__dot--on {
+  background: #fff;
+  transform: scale(1.25);
+}

@@ -1,0 +1,81 @@
+/* BuildingConfirmMap — tap-to-confirm picker for the "bad pin" flow. Mobile-first. */
+
+.bcm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bcm__map {
+  width: 100%;
+  height: 240px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+/* The 2.5D prisms are plain Leaflet SVG paths (walls + roof). Per-face colour/opacity
+   is set inline by the renderer (derived from the live danger tier), so there's nothing
+   to theme here — but a pointer cursor signals the blocks are tappable, matching the
+   list rows. Scoped under .bcm__map so it can't leak to the app's other Leaflet maps. */
+.bcm__map .leaflet-interactive {
+  cursor: pointer;
+}
+
+.bcm__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bcm__option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;            /* generous tap target for phones */
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 10px;
+  background: var(--color-surface, #fff);
+  color: inherit;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.bcm__option:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.bcm__option.is-selected {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+  font-weight: 600;
+}
+
+.bcm__swatch {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.bcm__option-text {
+  flex: 1 1 auto;
+}
+
+.bcm__confirm {
+  width: 100%;
+}
+
+.bcm__empty {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 0.9rem;
+}

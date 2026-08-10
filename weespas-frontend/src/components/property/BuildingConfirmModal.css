@@ -1,0 +1,12 @@
+/* BuildingConfirmModal — leans on .sf-modal* (StructuralFlagModal.css) for the shell;
+   only the candidate-specific bits live here. */
+
+.bcm-modal__status {
+  margin: 8px 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.bcm-modal__status--err {
+  color: #b91c1c;
+}

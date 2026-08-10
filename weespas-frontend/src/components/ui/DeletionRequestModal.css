@@ -1,0 +1,89 @@
+.deletion-request-modal {
+  position: relative;
+  width: 90%;
+  max-width: 440px;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-6);
+  text-align: center;
+  animation: confirmSlideUp var(--duration-normal) var(--ease-out);
+}
+
+.deletion-request-modal__icon {
+  color: var(--color-warning, #f59e0b);
+  margin-bottom: var(--space-3);
+}
+
+.deletion-request-modal__title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-2);
+}
+
+.deletion-request-modal__message {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-4);
+  line-height: 1.5;
+}
+
+.deletion-request-modal__message strong {
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+}
+
+.deletion-request-modal__textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: var(--space-3);
+  border: 1.5px solid rgba(2, 44, 34, 0.12);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  background: var(--color-bg);
+  outline: none;
+  resize: vertical;
+  margin-bottom: var(--space-4);
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.deletion-request-modal__textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.deletion-request-modal__textarea:focus {
+  border-color: var(--color-warning, #f59e0b);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.deletion-request-modal__textarea:disabled {
+  opacity: 0.6;
+}
+
+.deletion-request-modal__actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.deletion-request-modal__submit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-warning, #f59e0b);
+  color: #fff;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.deletion-request-modal__submit:hover { opacity: 0.9; }
+.deletion-request-modal__submit:disabled { opacity: 0.5; cursor: not-allowed; }

@@ -1,0 +1,393 @@
+/* ==========================================================================
+   TRENDING RAIL — LEFT-most STICKY card of BOOSTED PRODUCTS (§8).
+   Mirrors the AgentsPage VerticalVideo feed: a `position: sticky` card pinned just
+   below the navbar that stays in view while the page scrolls, then scrolls away
+   when the footer enters the viewport (it lives in the flow of .trade-page__layout,
+   so it releases when that column ends — NOT position:fixed, which would weld it to
+   the viewport forever and overlap the footer). Rounded on ALL corners with a clear
+   gap from the navbar, the feed and the viewport bottom. Hidden on narrow screens.
+
+   Layout role: it is the FIRST child of the .trade-page__layout flex row, so the
+   board reads [trending card][feed][remaining space]. Width stays 248px (the one
+   deliberate departure from the VerticalVideo column, per spec). */
+
+/* Real navbar height = inner --navbar-height (64) + its top/bottom padding
+   (2 × --space-3 = 24) ≈ 88px. The OLD rail offset by only --navbar-height, so it
+   tucked 24px UNDER the bar — this calc clears the whole bar, then adds a margin. */
+.trending-rail {
+  position: sticky;
+  top: calc(var(--navbar-height, 64px) + var(--space-3) * 2 + var(--space-4));
+  /* In a flex row a child stretches to the row height by default, which would defeat
+     sticky — pin to the start and give it a definite, viewport-bounded height. */
+  align-self: flex-start;
+  flex: 0 0 248px;
+  width: 248px;
+  /* Viewport height minus the navbar (88) minus the top gap (--space-4) minus a
+     matching bottom gap (--space-4) → the card floats with even margins. */
+  height: calc(100dvh - var(--navbar-height, 64px) - var(--space-3) * 2 - var(--space-4) * 2);
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-white);
+  border: 1px solid rgba(2, 44, 34, 0.08);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  /* Below the navbar and below the storefront panel (z-modal:1000, which intentionally
+     covers the rail when open), above page content. */
+  z-index: var(--z-sticky, 100);
+  overflow: hidden;
+}
+
+.trending-rail__head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  border-bottom: 1px solid rgba(2, 44, 34, 0.07);
+}
+
+/* Title on the left, the search toggle pinned to the far right (the spec's #7 placement). */
+.trending-rail__head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.trending-rail__title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.trending-rail__sub {
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+}
+
+/* Far-right search toggle — a compact icon button; tints to the brand when the field is open. */
+.trending-rail__search-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary, #6b7280);
+  border-radius: var(--radius-full, 9999px);
+  cursor: pointer;
+}
+.trending-rail__search-btn:hover { background: rgba(0, 0, 0, 0.05); }
+.trending-rail__search-btn.is-active { color: var(--color-primary, #022c22); }
+.trending-rail__search-btn:focus-visible {
+  outline: 2px solid var(--color-primary, #022c22);
+  outline-offset: 1px;
+}
+
+/* Localized search field — filters the fetched queue by title client-side (no refetch). */
+.trending-rail__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.trending-rail__search-icon {
+  position: absolute;
+  left: 9px;
+  color: var(--color-text-tertiary, #9ca3af);
+  pointer-events: none;
+}
+.trending-rail__search-input {
+  width: 100%;
+  padding: 6px 10px 6px 28px;  /* room for the leading icon */
+  border: 1px solid rgba(2, 44, 34, 0.15);
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.8rem;
+  font-family: inherit;
+  color: var(--color-text-primary, #1a1a1a);
+  background: var(--color-bg-white, #fff);
+}
+.trending-rail__search-input:focus {
+  outline: 2px solid var(--color-primary, #022c22);
+  outline-offset: 0;
+}
+/* Hide the native search "x" — the toggle in the head owns clear/close. */
+.trending-rail__search-input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+
+/* No-match hint when a search empties the (mounted) rail. */
+.trending-rail__empty {
+  margin: 0;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  font-size: 0.78rem;
+  color: var(--color-text-secondary, #6b7280);
+  text-align: center;
+}
+
+/* ── Chunk 1 (permanent columns): empty-state visuals ─────────────────────
+   The rail is now MOUNTED even with zero boosts (so the left column keeps its 248px width on
+   load). Two visual variants share the same <ul.trending-rail__board> element:
+     1. Skeleton — rendered while `data === undefined` (fetch in flight). Uses the shared
+        `.skeleton` class from styles/animations.css so we don't duplicate the shimmer keyframes
+        (rule 4). The global reduced-motion guard in styles/reset.css freezes the animation
+        automatically.
+     2. Placeholder — a single centered <li> shown once the server answers with zero cards.
+        `.trending-rail__board--empty` centers that lone child; the normal board flow is unchanged.
+   ---------------------------------------------------------------------- */
+.trending-rail__board--empty {
+  /* Recenter the placeholder within the board area — a normal board pins its content to the top
+     so short queues don't float mid-card. */
+  justify-content: center;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.trending-rail__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3);
+  text-align: center;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.trending-rail__placeholder-icon {
+  color: var(--color-text-secondary, #9ca3af);
+  opacity: 0.5;
+}
+
+.trending-rail__placeholder-title {
+  font-size: 0.82rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary, #111827);
+}
+
+.trending-rail__placeholder-sub {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+/* ── Skeleton rows — one per SKELETON_ROWS in TrendingRail.tsx ── */
+.trending-rail__item--skeleton { list-style: none; }
+
+/* The skeleton card mirrors the real .trending-rail__card footprint (55px inner + padding), so
+   the board fit-math would measure identically when real cards arrive. No cursor/hover/focus
+   affordance — the shimmer is not interactive. */
+.trending-rail__card--skeleton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 6px var(--space-3);
+  border-radius: var(--radius-md, 10px);
+  background: transparent;
+  border: 1px solid transparent;
+  min-height: 55px;
+  box-sizing: border-box;
+}
+
+.trending-rail__skeleton-icon {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md, 10px);
+}
+
+.trending-rail__skeleton-name {
+  display: block;
+  height: 12px;
+  width: 70%;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+.trending-rail__skeleton-row {
+  display: block;
+  height: 10px;
+  width: 45%;
+  border-radius: 4px;
+}
+
+/* The board: a column of FIXED product slots filling the card. The slot count is measured to fit
+   this viewport (useFitCount), so the board NEVER scrolls — each slot decays/refreshes in place and
+   the queue is shared across exactly the slots that fit. overflow:hidden is a belt-and-braces guard
+   against a sub-pixel rounding spill; it must never actually clip a card. */
+.trending-rail__board {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  /* Inter-card gap tightened from --space-3 (12px) → --space-2 (8px): combined with the slightly
+     shorter card below, this lets one more product slot fit a given board height (e.g. 6 instead
+     of 5 on a ~600px-tall window) without touching the text column. MUST stay in lockstep with
+     ROW_GAP in TrendingRail.tsx — useFitCount's fit math reads these as constants. */
+  gap: var(--space-2);
+  flex: 1;
+  overflow: hidden;
+}
+
+.trending-rail__item {
+  margin: 0;
+}
+
+/* One product card. The category color paints a left accent bar + a tint + the icon. The tint is
+   intentionally STRONGER than the feed-card tint (≈+25% contrast, per the rail spec): ~18% mix
+   (vs ~7% on the feed) and a darker derived accent for the icon/label so small colored glyphs stay
+   AA-legible on the tint. Done with rail-local color-mix off --cat-color so the GLOBAL --color-cat-*
+   tokens (which the feed card also reads) are untouched. */
+.trending-rail__card {
+  /* A darker accent derived from the category color — used for the icon + accent bar + PRICE text so
+     saturated mid-lights (amber/green/orange/teal) read clearly at small sizes on the tint. The
+     black share is 30% (was 15%): the in-browser contrast pass (trade_contrast.visual.js) measured
+     bakery/greengrocer/restaurant/pharmacy price text at 3.5–4.0 on their tint — below WCAG AA 4.5 —
+     because 15% wasn't dark enough for the lighter hues. 30% lifts every category ≥4.5 while keeping
+     the hue recognisable (darkening only raises contrast; the already-dark hues stay legible). */
+  --cat-accent: color-mix(in srgb, var(--cat-color, var(--color-cat-neutral)) 70%, #000 30%);
+
+  /* Positioning context for the corner boost spark (absolutely positioned, out of the flex flow). */
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  text-align: left;
+  /* Vertical padding trimmed (8px → 6px each side) to shave the card footprint by 4px so an extra
+     slot fits a short board; the 36px icon still sets a comfortable min row height, so the text is
+     not crowded. Horizontal padding unchanged. Keep ROW_H in TrendingRail.tsx in step with the
+     resulting rendered height. */
+  padding: 6px var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--cat-color, var(--color-cat-neutral)) 28%, transparent);
+  border-left: 4px solid var(--cat-accent);
+  border-radius: var(--radius-md, 10px);
+  /* +25% contrast: tint strengthened from ~7% → ~18% mix on white. */
+  background: color-mix(in srgb, var(--cat-color, var(--color-cat-neutral)) 18%, var(--color-bg-white));
+  cursor: pointer;
+  font-family: inherit;
+  /* Per-slot swap cross-fade (the card content is replaced by React; this softens the swap). */
+  animation: trending-card-in var(--duration-base, 280ms) var(--ease-out, ease-out);
+  transition:
+    box-shadow var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+@keyframes trending-card-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.trending-rail__card:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateX(-2px);
+}
+
+.trending-rail__card:focus-visible {
+  outline: 2px solid var(--cat-accent, var(--color-primary));
+  outline-offset: 2px;
+}
+
+/* The category icon sits in a tinted disc colored by the (darker) category accent. */
+.trending-rail__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full, 999px);
+  background: color-mix(in srgb, var(--cat-color, var(--color-cat-neutral)) 22%, var(--color-bg-white));
+  color: var(--cat-accent, var(--color-cat-neutral));
+  overflow: hidden;
+}
+
+/* The product's photo fills the icon circle when the listing has one (promotion shows the item). */
+.trending-rail__logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.trending-rail__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.trending-rail__name {
+  font-size: 0.85rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Reserve just enough room for the corner spark so the longest title ellipsizes BEFORE the glyph
+     rather than running under it (the spark shares the top row). Far less than the old pill's ~50px. */
+  padding-right: 14px;
+}
+
+.trending-rail__row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.trending-rail__price {
+  font-size: 0.78rem;
+  font-weight: var(--weight-bold);
+  color: var(--cat-accent, var(--color-text-primary));
+  white-space: nowrap;
+}
+
+.trending-rail__dist {
+  font-size: 0.68rem;
+  /* The muted --color-text-secondary (#6B7280) fails WCAG AA on EVERY category tint (measured 3.4–4.0
+     by trade_contrast.visual.js — the tint lightens the effective background below the 4.5 line).
+     Derive the distance color from the (already AA-dark) --cat-accent instead, lightened 45% toward
+     black-grey so it still reads as SECONDARY to the bold price yet clears 4.5:1 on its own tint.
+     Rail-local, so the global secondary-text token is untouched. */
+  color: color-mix(in srgb, var(--cat-accent, var(--color-text-secondary)) 78%, #000 22%);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Boost disclosure marker — a small accent "spark" pinned to the card's top-right corner. It is
+   absolutely positioned (NOT a flex child), so it no longer reserves horizontal space the way the
+   old pill did — the product title now gets the full card width. Decorative only: the accessible
+   "Boosted" disclosure rides the card's aria-label, and a `title` tooltip serves sighted users. */
+.trending-rail__spark {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent, #bfff00);
+  /* The whole card is the click target; the glyph must not intercept the press or hover. */
+  pointer-events: none;
+  /* A subtle dark outline keeps the bright accent glyph legible on any category tint. */
+  filter: drop-shadow(0 0 1px rgba(2, 44, 34, 0.45));
+}
+
+/* Respect reduced-motion: no swap-in animation (the rotation itself is also frozen in the hook, so
+   under reduced-motion the board is a static set of the first cards). */
+@media (prefers-reduced-motion: reduce) {
+  .trending-rail__card {
+    animation: none;
+  }
+}
+
+/* The rail only fits when there's real gutter beside the (now left-aligned) feed column. Below
+   ~1100px the feed + the 248px rail + margins stop fitting cleanly, so hide the rail and let the
+   feed own the screen. Content/feature parity is preserved — the same boosted products still appear
+   in the in-feed sponsored lane. The TradePage right-gutter reservation uses the same breakpoint. */
+@media (max-width: 1100px) {
+  .trending-rail {
+    display: none;
+  }
+}

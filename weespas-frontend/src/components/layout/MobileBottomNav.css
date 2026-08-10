@@ -1,0 +1,120 @@
+/* ==========================================================================
+   MOBILE BOTTOM NAV — Fixed bottom tab bar
+   Visible only below 768px. 4 equal tabs with Electric Lime active state.
+   ========================================================================== */
+
+/* ---------- Container ---------- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-bottom-nav, 150);
+  display: none; /* hidden on desktop by default */
+  align-items: stretch;
+  height: var(--bottom-nav-height, 64px);
+  padding-bottom: var(--safe-area-bottom, env(safe-area-inset-bottom, 0px));
+  background: var(--color-primary, #022C22);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* Show only on mobile */
+@media (max-width: 767px) {
+  .bottom-nav {
+    display: flex;
+  }
+}
+
+/* ---------- Individual Tab ---------- */
+.bottom-nav__tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1, 4px);
+  padding: var(--space-2, 8px) 0;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  position: relative;
+  transition: color var(--duration-fast, 150ms) var(--ease-out, ease-out);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.bottom-nav__tab:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Active tab text + icon color */
+.bottom-nav__tab--active {
+  color: var(--color-accent, #BFFF00);
+}
+
+/* Electric Lime underline indicator */
+.bottom-nav__tab--active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 3px;
+  border-radius: 0 0 var(--radius-sm, 4px) var(--radius-sm, 4px);
+  background: var(--color-accent, #BFFF00);
+  animation: scaleIn var(--duration-fast, 150ms) var(--ease-out, ease-out);
+}
+
+/* ---------- Icon wrapper ---------- */
+.bottom-nav__icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+/* ---------- Label ---------- */
+.bottom-nav__label {
+  font-family: var(--font-body, 'Nunito', sans-serif);
+  font-size: 0.625rem; /* 10px */
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.bottom-nav__tab--active .bottom-nav__label {
+  font-weight: 700;
+}
+
+/* ---------- Favorites count badge ---------- */
+.bottom-nav__badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent, #BFFF00);
+  color: var(--color-primary, #022C22);
+  font-family: var(--font-body, 'Nunito', sans-serif);
+  font-size: 0.625rem; /* 10px */
+  font-weight: 800;
+  line-height: 1;
+  border-radius: var(--radius-full, 9999px);
+  animation: scaleIn var(--duration-normal, 250ms) var(--ease-out, ease-out);
+}
+
+/* ---------- Spacer ----------
+   Add padding to the page body so content isn't hidden behind the nav.
+   Apply this class to your main content wrapper on mobile.                */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: calc(var(--bottom-nav-height, 64px) + var(--safe-area-bottom, env(safe-area-inset-bottom, 0px)));
+  }
+}

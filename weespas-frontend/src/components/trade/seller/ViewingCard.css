@@ -1,0 +1,300 @@
+/* ViewingCard — LEFT column, sits below RankingCard. Matches RankingCard's outer shape so the
+ * column reads as a stack of sibling cards. Two visual modes:
+ *   Live: one big count with a small caption.
+ *   History: a filter row + a scrolling list of past visits + "Load more".
+ * The Promote button lives OUTSIDE the tab body so it's always accessible regardless of tab. */
+
+.viewing-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+  padding: var(--space-4, 16px);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--color-surface, #ffffff);
+}
+
+.viewing-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2, 8px);
+  flex-wrap: wrap;
+}
+
+.viewing-card__title {
+  font-size: var(--fs-md, 16px);
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text-strong, #111827);
+}
+
+.viewing-card__toggle {
+  display: inline-flex;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+}
+
+.viewing-card__tab {
+  padding: 4px 12px;
+  font-size: var(--fs-sm, 14px);
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary, #6b7280);
+  cursor: pointer;
+}
+
+.viewing-card__tab.is-active {
+  background: var(--color-primary-soft, #eff6ff);
+  color: var(--color-primary, #2563eb);
+  font-weight: 600;
+}
+
+.viewing-card__body {
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.viewing-card__state {
+  margin: 0;
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--fs-sm, 14px);
+  text-align: center;
+}
+
+.viewing-card__state--error { color: var(--color-danger, #b91c1c); }
+
+/* -- Live tab -- */
+
+.viewing-card__live {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  padding: var(--space-2, 8px) 0;
+}
+
+.viewing-card__count {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2, 8px);
+  margin: 0;
+  color: var(--color-text-strong, #111827);
+}
+
+.viewing-card__count-value {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.viewing-card__count-unit {
+  font-size: var(--fs-sm, 14px);
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.viewing-card__count-caption {
+  margin: 0;
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+/* -- C+ live viewers: face + name + area + product-viewed rows -- */
+
+.viewing-card__title-count {
+  font-size: var(--fs-sm, 14px);
+  font-weight: 500;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.viewing-card__state--empty { color: var(--color-text-muted, #9ca3af); font-style: italic; }
+
+.viewing-card__viewers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.viewing-card__viewer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  padding: var(--space-2, 8px);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-surface-alt, #f9fafb);
+}
+
+.viewing-card__viewer-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--color-border-subtle, #f3f4f6);
+}
+
+.viewing-card__viewer-avatar--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.viewing-card__viewer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;   /* let the text truncate cleanly instead of overflowing the row */
+}
+
+.viewing-card__viewer-name {
+  font-size: var(--fs-sm, 14px);
+  color: var(--color-text-strong, #111827);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewing-card__viewer-sep { color: var(--color-text-muted, #9ca3af); font-weight: 400; }
+
+.viewing-card__viewer-area {
+  color: var(--color-text-secondary, #6b7280);
+  font-weight: 500;
+}
+
+.viewing-card__viewer-activity {
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewing-card__viewer-phone {
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-primary, #2563eb);
+  text-decoration: none;
+}
+.viewing-card__viewer-phone:hover { text-decoration: underline; }
+
+/* -- History tab -- */
+
+.viewing-card__history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.viewing-card__filters {
+  display: flex;
+  gap: var(--space-2, 8px);
+  flex-wrap: wrap;
+}
+
+.viewing-card__filter-label {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-secondary, #6b7280);
+  gap: 2px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.viewing-card__filter-label input {
+  padding: 4px 8px;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-md, 8px);
+  font-size: var(--fs-sm, 14px);
+}
+
+.viewing-card__history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-md, 8px);
+}
+
+.viewing-card__history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2, 8px);
+  padding: 6px 10px;
+  font-size: var(--fs-sm, 14px);
+  border-bottom: 1px solid var(--color-border-subtle, #f3f4f6);
+}
+
+.viewing-card__history-item:last-child { border-bottom: none; }
+
+.viewing-card__history-who { color: var(--color-text-strong, #111827); }
+
+.viewing-card__history-when {
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--fs-xs, 12px);
+}
+
+.viewing-card__history-empty {
+  padding: var(--space-4, 16px);
+  text-align: center;
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--fs-sm, 14px);
+}
+
+.viewing-card__more {
+  align-self: center;
+  padding: var(--space-1, 4px) var(--space-3, 12px);
+  font-size: var(--fs-sm, 14px);
+  background: transparent;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+}
+
+.viewing-card__more:disabled { opacity: 0.6; cursor: default; }
+
+/* -- Promote button -- */
+
+.viewing-card__promote {
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  padding-top: var(--space-3, 12px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.viewing-card__promote-btn {
+  padding: var(--space-2, 8px) var(--space-4, 16px);
+  background: var(--color-primary, #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  font-size: var(--fs-sm, 14px);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.viewing-card__promote-btn:disabled { opacity: 0.6; cursor: default; }
+.viewing-card__promote-btn:hover:not(:disabled) { background: var(--color-primary-strong, #1e40af); }
+
+.viewing-card__promote-feedback {
+  margin: 0;
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+  text-align: center;
+}

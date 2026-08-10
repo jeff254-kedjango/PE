@@ -1,0 +1,8 @@
+/* VerifiedBadge — small green checkmark icon */
+
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-success);
+  flex-shrink: 0;
+}

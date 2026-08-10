@@ -1,0 +1,80 @@
+/* ==========================================================================
+   PROPERTY LIST — Grid layout, skeleton loading, empty states
+   ========================================================================== */
+
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-6);
+}
+
+.property-grid--loading {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+/* ── Skeleton Card ── */
+.property-card--skeleton {
+  background: var(--color-bg-white);
+  border: 1px solid rgba(2, 44, 34, 0.08);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  min-height: 240px;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.skeleton-block {
+  background: linear-gradient(
+    90deg,
+    rgba(2, 44, 34, 0.04),
+    rgba(2, 44, 34, 0.08),
+    rgba(2, 44, 34, 0.04)
+  );
+  border-radius: var(--radius-md);
+  animation: shimmer 1.5s infinite ease;
+  background-size: 400% 100%;
+}
+
+.skeleton-image {
+  height: 140px;
+  border-radius: var(--radius-lg);
+}
+
+.skeleton-line {
+  height: 16px;
+}
+
+.skeleton-line.short {
+  width: 65%;
+}
+
+/* ── Empty / Error States ── */
+.empty-state {
+  background: var(--color-bg-white);
+  border: 1px dashed rgba(2, 44, 34, 0.16);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10) var(--space-8);
+  text-align: center;
+}
+
+.empty-state__title {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+}
+
+.empty-state__copy {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  font-size: var(--text-sm);
+}
+
+/* ── Responsive ── */
+@media (max-width: 720px) {
+  .property-grid {
+    gap: var(--space-4);
+  }
+}

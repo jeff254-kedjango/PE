@@ -1,0 +1,29 @@
+/* FavoriteButton — animated heart with glassmorphism background */
+
+.favorite-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border: none;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+  color: var(--color-text-secondary);
+}
+
+.favorite-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.1);
+}
+
+/* Active (favorited) state */
+.favorite-btn--active {
+  color: var(--color-heart);
+}
+
+/* The tap "pop" is driven by the shared `.animate-heart` class (styles/animations.css), applied
+   to the icon via the useHeartPop hook — same mechanism as the trade feed + comment hearts. */

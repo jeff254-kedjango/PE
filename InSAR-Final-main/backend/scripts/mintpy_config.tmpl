@@ -1,0 +1,132 @@
+# MintPy smallbaselineApp configuration — built from HyP3 InSAR_GAMMA products.
+#
+# This template is rendered per (AOI, track) by scripts/mintpy_run.py. Tokens
+# in {{double braces}} are substituted; everything else is the working SBAS
+# recipe for our setup (Sentinel-1 IW, 80 m looks, 12-day temporal baseline,
+# 24-month series).
+#
+# Reference: https://mintpy.readthedocs.io/en/latest/api/smallbaselineApp/
+#
+# Tuning rationale per knob is annotated inline — these are not defaults, they
+# are deliberate choices for our regime (low-coherence informal settlements,
+# coastal subsidence at building scale).
+
+########## load_data
+mintpy.load.processor      = hyp3
+# HyP3 GAMMA products extract as <work>/<aoi>/<job_name>/*_unw_phase.tif etc.
+# Job names are prefixed with the track (e.g. "l-A57-…" / "l-D79-…"), so an AOI
+# dir can hold both an ascending and a descending stack at once. MintPy refuses
+# to invert mixed geometries, so {{track_glob}} restricts the load to ONE track
+# (e.g. "*-A57-*"); each orbit gets its own run dir and the join fuses them.
+mintpy.load.unwFile        = {{work}}/{{aoi}}/{{track_glob}}/*_unw_phase.tif
+mintpy.load.corFile        = {{work}}/{{aoi}}/{{track_glob}}/*_corr.tif
+mintpy.load.demFile        = {{work}}/{{aoi}}/{{track_glob}}/*_dem.tif
+# include_inc_map=True gives the scalar incidence angle. The ASC+DESC join uses
+# it (plus each orbit's HEADING) to decompose LOS into vertical + east-west, so
+# the incidence map is load-bearing, not just diagnostic.
+mintpy.load.incAngleFile   = {{work}}/{{aoi}}/{{track_glob}}/*_inc_map.tif
+mintpy.load.waterMaskFile  = {{work}}/{{aoi}}/{{track_glob}}/*_water_mask.tif
+
+# Clip everything to the PROCESSING bbox before processing — drops the vast
+# full-frame surroundings, cutting RAM and runtime sharply. This is the widened
+# box (processing_side_m in scripts/aois.py), not the 2 km display tile: it must
+# contain the reference anchor (Karura) so reference.lalo can pin to it, and it
+# matches the Stage A clip extent the rasters were cropped to.
+mintpy.subset.lalo         = {{minlat}}:{{maxlat}},{{minlon}}:{{maxlon}}
+
+# Stage D — optional N×N load-time downsample for fast iteration. Rendered from
+# --multilook (default 1 = full-res, no multilooking). ystep/xstep = N (square
+# looks); method=auto (nearest = lines/rows skipping). 1 ≡ auto to MintPy; we
+# render the explicit value so the generated config is self-documenting.
+mintpy.multilook.method     = auto
+mintpy.multilook.ystep      = {{multilook}}
+mintpy.multilook.xstep      = {{multilook}}
+
+########## modify_network
+# Drop interferograms with mean coherence < 0.4 over the AOI. In Huruma (informal
+# settlement, corrugated iron) this is a real concern — letting decorrelated pairs
+# into the network biases the LS inversion. 0.4 is the standard threshold; raise
+# to 0.5 for urban concrete (Mombasa) if too many edges survive.
+mintpy.network.coherenceBased  = yes
+mintpy.network.minCoherence    = 0.4
+mintpy.network.keepMinSpanTree = yes
+
+########## reference_point
+# ARCHITECTURE_THREE A3 — reference anchor. Every velocity is relative to this
+# pixel. The defensible public-facing choice is an explicit anchor on stable
+# ground OUTSIDE the AOI (Karura — see scripts/aois.py, docs/methodology.md);
+# that requires the subset to include the anchor (Phase B). For the Phase-A
+# path-validation run the anchor sits outside the subset, so render passes
+# `auto` here (in-AOI max-coherence pixel → differential velocities). Which of
+# the two is emitted is decided by render_config, NOT hardcoded, so neither
+# branch leaves a stale/contradictory line behind.
+mintpy.reference.lalo      = {{reference_lalo}}
+mintpy.reference.coherenceFile = avgSpatialCoh.h5
+
+########## invert_network
+# ARCHITECTURE_THREE A4 — weighted least squares with coherence weights. Tier 3
+# of the risk model expects σ_v ∝ (1 - γ), and these weights are what produce
+# those σ estimates downstream. After GACOS (A1) lands the phase field is
+# meaningfully cleaner, so a 0.2 → 0.15 maskThreshold retune is on the table
+# once we've inspected the velocity-residual histogram from a post-GACOS run.
+mintpy.networkInversion.weightFunc = coh
+mintpy.networkInversion.maskDataset = coherence
+mintpy.networkInversion.maskThreshold = 0.2     # per-pixel-per-pair, very loose
+mintpy.networkInversion.minRedundancy = 1.0     # require at least 1 pair per date
+
+########## correct_unwrap_error
+# HyP3 GAMMA does not emit a `connectComponent` raster, which is what bridging
+# (and phase_closure) need to operate on. Our network is also a single
+# sequential chain (no triangles), so phase_closure has no work anyway.
+# Disable the step; coherence-weighted LS in invert_network is the safety net.
+mintpy.unwrapError.method = no
+
+########## correct_troposphere
+# ARCHITECTURE_THREE A1 — GACOS. Single largest correctable error source in
+# tropical InSAR. GACOS ingests ERA5 + InSAR geometry and emits per-acquisition
+# zenith-delay grids; MintPy projects them to LOS and removes per pixel.
+#
+# Falls back to height_correlation if {{gacos_dir}} is empty (e.g. GACOS
+# portal hadn't filled the request yet at MintPy run time). scripts/fetch_gacos.py
+# populates that directory build-time. Falling back here, not failing, keeps the
+# pipeline shippable even if GACOS is temporarily unavailable.
+mintpy.troposphericDelay.method   = gacos
+mintpy.troposphericDelay.gacosDir = {{gacos_dir}}
+# Dates whose SAR acquisition has no matching GACOS .ztd.tif grid. Without this,
+# the gacos step errors on the missing grid; excluding them drops those epochs
+# from the whole inversion (network + timeseries), keeping the stack consistent.
+# Rendered from the actual SAR-vs-GACOS date diff by render_config — empty token
+# ("auto") when every date has a grid, so no manual upkeep.
+mintpy.network.excludeDate        = {{exclude_dates}}
+
+########## deramp
+# Linear ramp removal — catches residual orbital error after the reference-point
+# correction. Quadratic would over-fit on a 2-km tile.
+mintpy.deramp = linear
+
+########## topographic_residual
+# ARCHITECTURE_THREE A2 — refine DEM residual jointly with velocity. Cheap and
+# improves the fit on tall buildings where the 30 m SRTM DEM misses 20+ m of
+# structure. The per-pixel `dem_err_m` output is surfaced as a UI badge in
+# Phase B3 — pixels with |residual| > 15 m are flagged "DEM-uncertain" rather
+# than hidden, so the viewer sees what the data can and cannot rule out.
+#
+# `mintpy.topographicResidual.stepFuncDate` is left unset: neither AOI has a
+# defensible terrain-disturbance event inside the 24-month window. Hook is
+# here for when one appears.
+mintpy.topographicResidual = yes
+# mintpy.topographicResidual.stepFuncDate = YYYYMMDD
+
+########## velocity
+# Annualized linear velocity in mm/yr. We do NOT enable bootstrapping (slow,
+# and we get σ_v from the inverse-variance of the coherence-weighted LS already).
+mintpy.velocity = yes
+
+########## geocode
+# Inputs are already geographic (the stack is reprojected to EPSG:4326 by
+# scripts/reproject_hyp3.py at ~0.0007°). Match that step so geocode is a
+# near-identity resample, not a 2.6× oversample to ~30 m — finer than the 80 m
+# HyP3 GAMMA multi-look resolution would only invent precision the data lacks.
+mintpy.geocode             = yes
+mintpy.geocode.laloStep    = 0.0007, 0.0007   # ~78 m, matches the reprojected stack
+mintpy.geocode.interpMethod = nearest

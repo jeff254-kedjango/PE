@@ -1,0 +1,32 @@
+/* ==========================================================================
+   PAGE TRANSITION — Fade + slide-up animation on route change
+   ========================================================================== */
+
+/* fill-mode is intentionally the default `none`, NOT `both`. A retained transform (even the
+   end-state translateY(0)) establishes a containing block for `position: fixed` descendants, which
+   traps fixed children — the §8 TrendingRail (flush navbar→viewport-bottom) and the Storefront
+   sheet overlay — inside this route wrapper instead of the viewport (the rail resolved to ~16000px tall,
+   the full document height, rather than the ~836px viewport). With `none` fill the transform
+   reverts to `none` the instant the 300ms entrance finishes, releasing fixed descendants; the end
+   state (opacity 1, no translate) is visually identical, so the animation itself looks unchanged. */
+.page-transition {
+  animation: pageEnter var(--duration-normal, 300ms) var(--ease-out, ease-out);
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none;
+  }
+}

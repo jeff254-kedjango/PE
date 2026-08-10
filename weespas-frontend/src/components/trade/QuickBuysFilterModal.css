@@ -1,0 +1,215 @@
+/* ==========================================================================
+   QUICK BUYS FILTER POPOVER — search / price / category / location-radius.
+
+   A LOCALIZED popover (NOT a full-page modal): it renders position:absolute under the filter
+   button inside the Quick Buys section (.quick-buys__filter anchor), so it dims/blocks only that
+   card — never the whole page. Mirrors the shop hovercard's in-context feel: a floating opaque
+   card, drop-in animation, right-aligned to the trigger. Dismissal (outside-click + Escape) is
+   owned by the parent QuickBuys. Scoped with the qb- prefix so it can't collide with adv-modal.
+   ========================================================================== */
+
+/* Anchor: the filter button + its popover share this relative box in the header. */
+.quick-buys__filter {
+  position: relative;
+  display: inline-flex;
+}
+
+.qb-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;               /* the trigger sits at the far right of the header — align to it */
+  z-index: var(--z-modal, 500);  /* above the rail content, below toasts */
+  width: 300px;
+  max-width: min(300px, calc(100vw - 32px));
+  max-height: min(70vh, 560px);
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface, #fff);  /* OPAQUE — dialog surfaces must never be see-through */
+  border: 1px solid rgba(2, 44, 34, 0.1);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-card-hover, 0 12px 36px rgba(0, 0, 0, 0.18));
+  overflow: hidden;
+  animation: qb-popover-in var(--duration-fast, 0.12s) var(--ease-out, ease-out);
+}
+
+@keyframes qb-popover-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.qb-popover__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  border-bottom: 1px solid rgba(2, 44, 34, 0.08);
+}
+
+.qb-popover__header-left { display: inline-flex; align-items: center; gap: var(--space-2, 8px); }
+.qb-popover__header-left h2 {
+  margin: 0;
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--weight-bold, 700);
+  color: var(--color-text, #1a1a1a);
+}
+
+.qb-popover__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary, #6b7280);
+  border-radius: var(--radius-full, 9999px);
+  cursor: pointer;
+}
+.qb-popover__close:hover { background: rgba(0, 0, 0, 0.05); }
+
+.qb-popover__body {
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+}
+
+/* ── Live search field ── */
+.qb-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.qb-search__icon {
+  position: absolute;
+  left: 10px;
+  color: var(--color-text-tertiary, #9ca3af);
+  pointer-events: none;
+}
+.qb-search__input {
+  width: 100%;
+  padding: 8px 30px 8px 32px;  /* room for the leading icon + trailing clear button */
+  border: 1px solid rgba(2, 44, 34, 0.15);
+  border-radius: var(--radius-full, 9999px);
+  font-size: var(--text-sm, 0.875rem);
+  font-family: inherit;
+  color: var(--color-text, #1a1a1a);
+  background: #fff;
+}
+.qb-search__input:focus { outline: 2px solid var(--color-primary, #022c22); outline-offset: 0; }
+/* Hide the native search "x" clear — we render our own for a consistent look. */
+.qb-search__input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.qb-search__clear {
+  position: absolute;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary, #6b7280);
+  border-radius: var(--radius-full, 9999px);
+  cursor: pointer;
+}
+.qb-search__clear:hover { background: rgba(0, 0, 0, 0.06); }
+
+.qb-section__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--space-2, 8px);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--weight-semibold, 600);
+  color: var(--color-text, #1a1a1a);
+}
+
+.qb-row { display: flex; gap: var(--space-3, 12px); }
+.qb-field { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.qb-field label {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-secondary, #6b7280);
+}
+.qb-field input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(2, 44, 34, 0.15);
+  border-radius: var(--radius-sm, 6px);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text, #1a1a1a);
+  background: #fff;
+}
+.qb-field input:focus { outline: 2px solid var(--color-primary, #022c22); outline-offset: 0; }
+
+.qb-chips { display: flex; flex-wrap: wrap; gap: var(--space-2, 8px); }
+.qb-chip {
+  padding: 5px 11px;
+  border: 1px solid rgba(2, 44, 34, 0.15);
+  border-radius: var(--radius-full, 9999px);
+  background: #fff;
+  color: var(--color-text, #1a1a1a);
+  font-size: var(--text-xs, 0.75rem);
+  cursor: pointer;
+  transition: background var(--duration-fast, 150ms) var(--ease-out, ease),
+    border-color var(--duration-fast, 150ms) var(--ease-out, ease);
+}
+.qb-chip:hover { border-color: rgba(2, 44, 34, 0.3); }
+.qb-chip.active {
+  background: var(--color-primary, #022c22);
+  border-color: var(--color-primary, #022c22);
+  color: var(--color-text-inverse, #fff);
+}
+
+.qb-popover__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3, 12px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  border-top: 1px solid rgba(2, 44, 34, 0.08);
+}
+
+.qb-popover__clear {
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary, #6b7280);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--weight-semibold, 600);
+  cursor: pointer;
+}
+.qb-popover__clear:hover { color: var(--color-text, #1a1a1a); }
+
+.qb-popover__apply {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: 8px 18px;
+  border: none;
+  border-radius: var(--radius-full, 9999px);
+  background: var(--color-primary, #022c22);
+  color: var(--color-text-inverse, #fff);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--weight-semibold, 600);
+  cursor: pointer;
+}
+.qb-popover__apply:hover { background: var(--color-primary-light, #064e3b); }
+
+.qb-popover__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(255, 255, 255, 0.25);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--weight-bold, 700);
+}
+
+/* On narrow screens the right rail is hidden entirely (see TradePage.css <1101px), so this popover
+   never shows on mobile — no bottom-sheet fallback needed. It only ever renders in the desktop
+   rail, anchored to its trigger. */

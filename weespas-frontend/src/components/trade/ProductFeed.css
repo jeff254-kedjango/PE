@@ -1,0 +1,78 @@
+/* ==========================================================================
+   PRODUCT FEED — a single SOCIAL column of post cards + state panels.
+   The feed reads like a social timeline (FB/X/LinkedIn), one post per row in a
+   centred, readable-width column — NOT a dense SKU grid (that's the storefront).
+   ========================================================================== */
+
+.product-feed {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.product-feed__column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  /* Centred, social-timeline readable width — large screens get whitespace, not more columns. */
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* Loading / empty / error / location-prompt panels share one calm centered style. */
+.product-feed__state {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: center;
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+.product-feed__state--error {
+  color: var(--color-danger, #b3261e);
+}
+
+/* Auto-widen note: "closest shops are within X km" when the immediate radius was empty. A calm,
+   non-alarming banner above the timeline — same readable width as the column, secondary text so it
+   informs without shouting. Distance-only copy (no delivery claim). */
+.product-feed__widen-note {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md, 10px);
+  background: var(--color-surface-2, rgba(0, 0, 0, 0.04));
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.product-feed__more {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-4) 0;
+}
+
+.product-feed__cta {
+  appearance: none;
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-pill, 999px);
+  padding: var(--space-3) var(--space-6);
+  font-size: 0.9rem;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.product-feed__cta:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.product-feed__cta:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

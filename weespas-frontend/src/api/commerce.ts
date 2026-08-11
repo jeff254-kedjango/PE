@@ -877,6 +877,67 @@ export function lowStockCount(data: LowStockOut | undefined): number {
   return n;
 }
 
+/** One weighted contribution to the WeesStock composite. `weighted` is the value AFTER its
+ *  weight, so components sum to `score` exactly; `weight` is echoed so the UI can say
+ *  "counts for 40%" without duplicating server constants that could drift. */
+export interface CreditComponent {
+  key: string;
+  label: string;
+  weighted: number;
+  weight: number;
+}
+
+/** Response of GET /sellers/me/credit-profile — the seller's OWN WeesStock profile.
+ *
+ *  `score` is `null` on a thin file. That is a first-class "not enough evidence yet" state,
+ *  NOT a low score: coercing it to 0 would tell a healthy new shop it is uncreditworthy.
+ *  Branch on `is_scoreable` and use `orders_needed` / `days_needed` to render a growth prompt.
+ *
+ *  Money is integer cents plus an ISO-4217 `currency` — never a float, never preformatted.
+ *  Nothing here is buyer PII; every field is an aggregate over the caller's own rows. */
+export interface CreditProfileOut {
+  score: number | null;
+  is_scoreable: boolean;
+  missing_for_score: string[];
+  orders_needed: number;
+  days_needed: number;
+
+  currency: string;
+  revenue_cents: number;
+  recent_revenue_cents: number;
+  avg_order_value_cents: number;
+  /** Recent run-rate vs the full window, normalised so steady trading reads 1.0. `null` when
+   *  there is no revenue to compare — a ratio against zero is undefined, not flat. */
+  revenue_trend: number | null;
+
+  settled_orders: number;
+  failed_orders: number;
+  fulfilment_rate: number;
+  unique_buyers: number;
+  repeat_buyers: number;
+  repeat_rate: number;
+  rating: number;
+  rating_count: number;
+  /** Reported for context but weighted ZERO — inquiries are self-generatable. */
+  inquiries: number;
+  tenure_days: number;
+
+  components: CreditComponent[];
+  window_days: number;
+  recent_window_days: number;
+}
+
+/** Fetch the caller's own WeesStock credit profile. Self-view only: the server derives the
+ *  seller from the token, so there is no id to pass and no way to request another shop's. */
+export async function getMyCreditProfile(
+  session: CommerceSession,
+): Promise<CreditProfileOut> {
+  return fetchJson<CreditProfileOut>(
+    `${apiBase(session.commerce_url)}/sellers/me/credit-profile`,
+    { ...crossOrigin, headers: authHeaders(session.token) },
+  );
+}
+
 /** Fetch the caller's low-stock product listings, sorted most-urgent-first. */
 export async function getMyLowStock(
   session: CommerceSession,

@@ -25,6 +25,7 @@ import InquiriesCard from '../components/trade/seller/InquiriesCard';
 import LowStockCard from '../components/trade/seller/LowStockCard';
 import RankingCard from '../components/trade/seller/RankingCard';
 import ViewingCard from '../components/trade/seller/ViewingCard';
+import WeesStockCard from '../components/trade/seller/WeesStockCard';
 import PageMeta from '../components/ui/PageMeta';
 import type { ListingOut, ShopOut } from '../api/commerce';
 import './SellerConsolePage.css';
@@ -92,6 +93,11 @@ const SellerConsolePage: React.FC = () => {
             {/* Chunk E2: Low-stock triage. Clicking Restock reuses the same EditListingForm
                 the dashboard row's Edit button opens — one editor, two entry points. */}
             <LowStockCard session={session} onRestock={(li) => setEditListing(li)} />
+            {/* §WeesStock F2: funding readiness from settled receipts. Placed LAST because it is
+                a periodic "how is my business doing" read, not the daily triage the cards above
+                serve — and because its own answer partly depends on acting on them. Despite the
+                shared word, this is the FINANCING surface; LowStockCard above is inventory. */}
+            <WeesStockCard session={session} />
           </div>
           <div className="seller-console__col seller-console__col--right">
             <SellerDashboard

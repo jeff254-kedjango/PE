@@ -1,0 +1,215 @@
+/* WeesStockCard — LEFT column of /trade/sell. Same calm-admin chrome as RankingCard and
+ * LowStockCard so the column reads as one surface.
+ *
+ * Hierarchy differs from RankingCard on purpose. There, the rank number IS the message, so it
+ * dominates. Here the component bars are the message (doctrine 1: components are the product,
+ * the composite is a sort key), so the score is present but restrained — it must not out-shout
+ * the breakdown that explains it. */
+
+.weesstock-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+  padding: var(--space-4, 16px);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--color-surface, #ffffff);
+}
+
+.weesstock-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2, 8px);
+}
+
+.weesstock-card__title {
+  font-size: var(--fs-md, 16px);
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text-strong, #111827);
+}
+
+.weesstock-card__hint {
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+.weesstock-card__body {
+  /* Reserve height so the loading → scored / thin-file swap doesn't shift the cards below it
+     in the column. The two real states are close in height; this floor covers both. */
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+}
+
+.weesstock-card__state {
+  margin: 0;
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--fs-sm, 14px);
+}
+
+.weesstock-card__state--error {
+  color: var(--color-danger, #b91c1c);
+}
+
+/* ---- composite ---- */
+
+.weesstock-card__score-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2, 8px);
+}
+
+.weesstock-card__score {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.weesstock-card__score-value {
+  font-size: var(--fs-2xl, 32px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-text-strong, #111827);
+  /* Tabular figures: the score refreshes in place every 5 min, and proportional digits make
+     the number visibly jitter as it re-renders. */
+  font-variant-numeric: tabular-nums;
+}
+
+.weesstock-card__score-max {
+  font-size: var(--fs-sm, 14px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+/* Thin file. Deliberately NOT styled as an error or a warning — no red, no alert icon. A new
+   shop has done nothing wrong, and the visual language has to say "in progress", not "denied". */
+.weesstock-card__pending {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.weesstock-card__pending-label {
+  font-size: var(--fs-lg, 20px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+}
+
+.weesstock-card__pending-hint {
+  margin: 0;
+  font-size: var(--fs-sm, 14px);
+  color: var(--color-text-secondary, #4b5563);
+}
+
+/* ---- component bars ---- */
+
+.weesstock-card__components {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.weesstock-card__component-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2, 8px);
+  margin-bottom: 3px;
+}
+
+.weesstock-card__component-label {
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-secondary, #4b5563);
+}
+
+.weesstock-card__component-weight {
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+  font-variant-numeric: tabular-nums;
+}
+
+.weesstock-card__bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-surface-alt, #f3f4f6);
+  overflow: hidden;
+}
+
+.weesstock-card__bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-primary, #2563eb);
+  /* Width is the only animated property (compositor-friendly); a bar that snaps between
+     refreshes reads as a glitch rather than as progress. */
+  transition: width 240ms ease-out;
+}
+
+/* Respect users who have asked the OS for less motion — the transition is decorative. */
+@media (prefers-reduced-motion: reduce) {
+  .weesstock-card__bar-fill {
+    transition: none;
+  }
+}
+
+/* ---- supporting facts ---- */
+
+.weesstock-card__facts {
+  display: grid;
+  /* Two columns on a wide left column, collapsing to one when the card is narrow. auto-fit
+     keeps this responsive without a media query tied to a specific breakpoint. */
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-2, 8px) var(--space-3, 12px);
+  margin: 0;
+}
+
+.weesstock-card__fact dt {
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+.weesstock-card__fact dd {
+  margin: 0;
+  font-size: var(--fs-sm, 14px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+  font-variant-numeric: tabular-nums;
+}
+
+.weesstock-card__fact-sub {
+  font-weight: 400;
+  color: var(--color-text-muted, #6b7280);
+}
+
+/* "· not scored" on the inquiries row — present so the exclusion is explicit, muted so it
+   doesn't compete with the fields that DO count. */
+.weesstock-card__fact-note {
+  font-style: italic;
+  color: var(--color-text-muted, #9ca3af);
+}
+
+.weesstock-card__trend {
+  margin-left: 4px;
+  font-weight: 700;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.weesstock-card__trend--up {
+  color: var(--color-success, #15803d);
+}
+
+/* Down is amber, not red: trading below your own 90-day average is a signal worth seeing, not
+   a failure. Red here would misread ordinary seasonality as an alarm. */
+.weesstock-card__trend--down {
+  color: var(--color-warning, #b45309);
+}
+
+.weesstock-card__footnote {
+  margin: 0;
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+}

@@ -19,9 +19,13 @@ from PE.commerce.core.auth import (
 from PE.commerce.core.config import settings
 from PE.commerce.core.database import get_db
 from PE.commerce.models.boost import BOOST_TIERS
+from PE.commerce.models.seller import Seller
 from PE.commerce.schemas import boost as boost_schemas
 from PE.commerce.schemas import catalog as schemas
-from PE.commerce.services import boost, boost_cap, catalog, flash_sales, reviews, shops
+from PE.commerce.schemas import weesstock as weesstock_schemas
+from PE.commerce.services import (
+    boost, boost_cap, catalog, credit_score, flash_sales, reviews, shops,
+)
 
 router = APIRouter(tags=["sellers"])
 
@@ -406,6 +410,35 @@ def my_low_stock(
         groups[-1].items.append(li)
 
     return schemas.LowStockOut(floor=floor, groups=groups)
+
+
+@router.get("/sellers/me/credit-profile", response_model=weesstock_schemas.CreditProfileOut)
+def my_credit_profile(
+    db: Session = Depends(get_db),
+    principal: CommercePrincipal = Depends(_require_write),
+) -> weesstock_schemas.CreditProfileOut:
+    """The caller's OWN WeesStock credit profile (§WeesStock F2).
+
+    Self-view only: the profile is computed for the seller row behind the token ``sub``, so
+    there is no id parameter to tamper with and no way to request somebody else's numbers.
+    The financier-facing view of another shop is a separate, consent-gated endpoint (F4) —
+    deliberately NOT reachable from here.
+
+    A caller who has never sold (no seller row) gets a zeroed, unscoreable profile rather than
+    a 404: "you have no history yet" is the honest answer for a shop owner who just signed up,
+    and a 404 would make the card render an error for a perfectly valid new user.
+
+    Not cached. The underlying aggregates are a fixed handful of indexed queries, and a seller
+    refreshing after a sale must see the sale — a stale credit number is worse than a slow one.
+    """
+    seller = db.query(Seller).filter(Seller.user_uuid == principal.sub).one_or_none()
+    now = datetime.now(timezone.utc)
+    if seller is None:
+        # Synthesise an empty seller for the pure scorer rather than branching the response
+        # shape. tenure 0 + no rows ⇒ score None, missing = both gates, every component 0.
+        seller = Seller(user_uuid=principal.sub, display_name="", created_at=now)
+    profile = credit_score.compute_credit_profile(db, seller, now=now)
+    return weesstock_schemas.to_credit_profile_out(profile)
 
 
 @router.get("/shops/mine", response_model=schemas.StorefrontOut)

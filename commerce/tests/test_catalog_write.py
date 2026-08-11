@@ -597,6 +597,16 @@ def test_delete_requires_write_scope(client):
 
 # --------------------------- §8 Chunk E2 — low-stock listing ---------------------------
 
+def _low_stock_items(body: dict) -> list[dict]:
+    """Flatten the grouped low-stock response back to a single ordered listing list.
+
+    The response carries listings ONLY inside ``groups`` (the flattened ``items`` mirror was
+    removed — it doubled a 30s-polled payload). Tests that don't care about grouping use this;
+    ``test_groups_by_shop_with_names`` asserts on the group structure directly.
+    """
+    return [li for g in body["groups"] for li in g["items"]]
+
+
 class TestLowStockEndpoint:
     """GET /sellers/me/low-stock — the LEFT-column card's data source."""
 
@@ -604,7 +614,7 @@ class TestLowStockEndpoint:
         r = client.get("/api/v1/sellers/me/low-stock", headers=_auth(sub="ghost-seller"))
         assert r.status_code == 200, r.text
         body = r.json()
-        assert body == {"floor": 5, "items": []}
+        assert body == {"floor": 5, "groups": []}
 
     def test_shop_wide_floor_triggers_on_untouched_listings(self, client):
         shop = _make_shop(client).json()
@@ -614,22 +624,73 @@ class TestLowStockEndpoint:
         assert r.status_code == 200
         body = r.json()
         assert body["floor"] == 5
-        assert len(body["items"]) == 1
-        assert body["items"][0]["title"] == "A" and body["items"][0]["stock_qty"] == 3
+        items = _low_stock_items(body)
+        assert len(items) == 1
+        assert items[0]["title"] == "A" and items[0]["stock_qty"] == 3
 
-    def test_per_listing_threshold_overrides_shop_floor(self, client):
+    def test_card_threshold_is_absolute_ignoring_per_listing_threshold(self, client):
+        """The card's threshold is the ONLY filter: stock_qty <= floor, full stop.
+
+        Regression guard. A previous revision treated a per-listing ``low_stock_threshold > 0``
+        as an exclusive replacement for the floor, so a listing carrying its own threshold was
+        matched only against that threshold — raising the card's Threshold could never surface
+        it. That read to the seller as "the filter is broken".
+        """
         shop = _make_shop(client).json()
-        # A listing with threshold=10 and stock=8 IS low (8 <= 10) even though 8 > shop floor 5.
-        li = _make_listing(client, shop["id"], title="Bigcase", stock_qty=8,
-                           low_stock_threshold=10).json()
-        # And a listing with threshold=1 and stock=3 is NOT low (3 > 1) — its own threshold
-        # beats the shop-wide floor of 5.
-        _make_listing(client, shop["id"], title="Bulk", stock_qty=3,
-                      low_stock_threshold=1).json()
+        # Own threshold of 2 must NOT exempt this from a floor of 10 (8 <= 10 ⇒ shown).
+        _make_listing(client, shop["id"], title="OwnThreshold", stock_qty=8,
+                      low_stock_threshold=2)
+        # No threshold set — plain floor case.
+        _make_listing(client, shop["id"], title="NoThreshold", stock_qty=8)
+        # Above the floor ⇒ hidden, even though its own threshold (20) would trigger.
+        _make_listing(client, shop["id"], title="WellStocked", stock_qty=15,
+                      low_stock_threshold=20)
+
+        r = client.get("/api/v1/sellers/me/low-stock?floor=10", headers=_auth())
+        assert r.status_code == 200
+        titles = sorted(i["title"] for i in _low_stock_items(r.json()))
+        assert titles == ["NoThreshold", "OwnThreshold"]
+
+    def test_raising_threshold_widens_the_list_monotonically(self, client):
+        """Raising the threshold may only ADD rows — never drop one. This is the invariant the
+        seller actually relies on when dragging the Threshold input upward."""
+        shop = _make_shop(client).json()
+        for n in (1, 4, 8, 12):
+            _make_listing(client, shop["id"], title=f"S{n}", stock_qty=n,
+                          # Alternate own-thresholds to prove they don't perturb the rule.
+                          low_stock_threshold=(3 if n % 2 == 0 else 0))
+        seen: set[str] = set()
+        for floor in (0, 1, 4, 8, 12):
+            r = client.get(f"/api/v1/sellers/me/low-stock?floor={floor}", headers=_auth())
+            titles = {i["title"] for i in _low_stock_items(r.json())}
+            assert seen <= titles, f"floor={floor} DROPPED rows: {seen - titles}"
+            assert titles == {f"S{n}" for n in (1, 4, 8, 12) if n <= floor}
+            seen = titles
+
+    def test_groups_by_shop_with_names(self, client):
+        """A seller with several shops gets one group per shop, each with its display name."""
+        shop_a = _make_shop(client, name="Juja Grocers").json()
+        shop_b = _make_shop(client, name="Kilimani Kiosk").json()
+        _make_listing(client, shop_a["id"], title="A-low", stock_qty=2)
+        _make_listing(client, shop_b["id"], title="B-low", stock_qty=1)
+        _make_listing(client, shop_b["id"], title="B-lower", stock_qty=0)
+
         r = client.get("/api/v1/sellers/me/low-stock", headers=_auth())
         assert r.status_code == 200
-        items = r.json()["items"]
-        assert len(items) == 1 and items[0]["id"] == li["id"]
+        body = r.json()
+        groups = {g["shop_name"]: g for g in body["groups"]}
+        assert set(groups) == {"Juja Grocers", "Kilimani Kiosk"}
+        assert [i["title"] for i in groups["Juja Grocers"]["items"]] == ["A-low"]
+        # Most-urgent-first WITHIN a group.
+        assert [i["title"] for i in groups["Kilimani Kiosk"]["items"]] == ["B-lower", "B-low"]
+        # Every grouped listing belongs to the group it sits in, and groups are disjoint.
+        for g in body["groups"]:
+            assert all(i["shop_id"] == g["shop_id"] for i in g["items"])
+        # Every low-stock listing appears exactly once across all groups — no duplication.
+        assert sum(len(g["items"]) for g in body["groups"]) == 3
+        assert len({i["id"] for i in _low_stock_items(body)}) == 3
+        # One group per shop — a shop never gets split into two groups.
+        assert len({g["shop_id"] for g in body["groups"]}) == len(body["groups"])
 
     def test_ordered_ascending_by_stock(self, client):
         shop = _make_shop(client).json()
@@ -637,7 +698,7 @@ class TestLowStockEndpoint:
         _make_listing(client, shop["id"], title="Five", stock_qty=5)
         _make_listing(client, shop["id"], title="One", stock_qty=1)
         r = client.get("/api/v1/sellers/me/low-stock", headers=_auth())
-        items = r.json()["items"]
+        items = _low_stock_items(r.json())
         assert [i["stock_qty"] for i in items] == [1, 2, 5]
 
     def test_excludes_inactive_listings(self, client):
@@ -646,7 +707,7 @@ class TestLowStockEndpoint:
         # DELETE soft-deactivates the listing (flips is_active=false).
         client.delete(f"/api/v1/listings/{li['id']}", headers=_auth())
         r = client.get("/api/v1/sellers/me/low-stock", headers=_auth())
-        assert r.json()["items"] == []
+        assert r.json()["groups"] == []
 
     def test_scope_gating(self, client):
         # No token → 401 (or 403 depending on the shared auth policy — mirrors adjust_stock).
@@ -664,7 +725,7 @@ class TestLowStockEndpoint:
         r = client.get("/api/v1/sellers/me/low-stock?floor=10", headers=_auth())
         body = r.json()
         assert body["floor"] == 10
-        titles = sorted(i["title"] for i in body["items"])
+        titles = sorted(i["title"] for i in _low_stock_items(body))
         assert titles == ["A"]
 
     def test_negative_floor_clamped_to_zero(self, client):
@@ -675,17 +736,23 @@ class TestLowStockEndpoint:
         body = r.json()
         assert body["floor"] == 0
         # Only stock_qty=0 satisfies "<= 0"; a listing at 1 is above the clamped floor.
-        titles = [i["title"] for i in body["items"]]
+        titles = [i["title"] for i in _low_stock_items(body)]
         assert titles == ["Zero"]
 
     def test_excludes_other_sellers_listings(self, client):
-        shop_a = _make_shop(client, sub="seller-A").json()
-        shop_b = _make_shop(client, sub="seller-B").json()
+        # Distinct names: the default is shared, which would make the leak assertion below
+        # vacuous (seller-A's own name would match seller-B's).
+        shop_a = _make_shop(client, sub="seller-A", name="A Grocers").json()
+        shop_b = _make_shop(client, sub="seller-B", name="B Kiosk").json()
         _make_listing(client, shop_a["id"], sub="seller-A", title="Mine", stock_qty=1)
         _make_listing(client, shop_b["id"], sub="seller-B", title="Theirs", stock_qty=1)
         r = client.get("/api/v1/sellers/me/low-stock", headers=_auth(sub="seller-A"))
-        items = r.json()["items"]
-        assert [i["title"] for i in items] == ["Mine"]
+        body = r.json()
+        assert [i["title"] for i in _low_stock_items(body)] == ["Mine"]
+        # Grouping added a second surface that names shops — assert the OTHER seller's shop
+        # id/name can't ride along in a group header even when it has qualifying stock.
+        assert [g["shop_id"] for g in body["groups"]] == [shop_a["id"]]
+        assert shop_b["id"] not in r.text and shop_b["name"] not in r.text
 
 
 # --------------------------- §8 Chunk E3 — bulk stock CSV ---------------------------
@@ -806,3 +873,4 @@ class TestBulkStockCsv:
         r = client.post("/api/v1/sellers/me/stock/bulk-csv",
                         json={"csv": "x,1\n"}, headers=_auth(scopes=("read:feed",)))
         assert r.status_code == 403
+

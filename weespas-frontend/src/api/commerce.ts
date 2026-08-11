@@ -850,11 +850,31 @@ export async function postBulkStockCsv(
 
 // ----------------------------- low-stock (§8, Chunk E2) -----------------------------
 
-/** Response of GET /sellers/me/low-stock. `floor` echoes the applied shop-wide backstop so the
- *  UI can say "listings at or below 5"; per-listing thresholds still trigger regardless. */
+/** One shop's slice of the low-stock list — a seller with several shops gets one per shop so
+ *  the card can render a header per shop instead of one undifferentiated list. */
+export interface LowStockGroup {
+  shop_id: string;
+  shop_name: string;
+  items: ListingOut[];
+}
+
+/** Response of GET /sellers/me/low-stock. `floor` is ABSOLUTE: the server returns exactly the
+ *  listings with `stock_qty <= floor`. A listing's own `low_stock_threshold` drives its
+ *  `is_low_stock` badge but does NOT filter this list. Listings live only inside `groups` —
+ *  the server no longer mirrors them in a flattened `items` array (it doubled a 30s-polled
+ *  payload and gave the response two sources of truth); derive the total with `lowStockCount`. */
 export interface LowStockOut {
   floor: number;
-  items: ListingOut[];
+  groups: LowStockGroup[];
+}
+
+/** Total low-stock listings across every shop group — the card's "(N)" counter. O(groups),
+ *  and groups are few (one per shop the seller owns). */
+export function lowStockCount(data: LowStockOut | undefined): number {
+  if (!data) return 0;
+  let n = 0;
+  for (const g of data.groups) n += g.items.length;
+  return n;
 }
 
 /** Fetch the caller's low-stock product listings, sorted most-urgent-first. */

@@ -331,16 +331,35 @@ class BulkStockOut(BaseModel):
     updated_ids: list[str]
 
 
-class LowStockOut(BaseModel):
-    """Response of GET /sellers/me/low-stock — §8 Chunk E2. The card lists the caller's product
-    listings that are AT OR BELOW the reorder signal, sorted most-urgent-first.
+class LowStockGroup(BaseModel):
+    """One shop's slice of the low-stock list. A seller with several shops gets one group per
+    shop so the card can render a header per shop instead of one undifferentiated list.
 
-    ``floor`` echoes the caller-supplied (or default) shop-wide floor so the UI can say
-    "listings at or below 5"; individual listings with their own ``low_stock_threshold`` set
-    still appear when THAT threshold triggers, regardless of the floor.
+    ``shop_name`` is display-only and always the caller's OWN shop (the query is scoped to the
+    caller's seller row), so there is no cross-tenant exposure here.
+    """
+    shop_id: str
+    shop_name: str
+    items: list[ListingOut]
+
+
+class LowStockOut(BaseModel):
+    """Response of GET /sellers/me/low-stock — §8 Chunk E2. Lists the caller's active product
+    listings whose ``stock_qty <= floor``, grouped by shop, most-urgent-first within each group.
+
+    ``floor`` echoes the applied threshold so the UI can say "listings at or below 5". The rule
+    is absolute — ``stock_qty <= floor`` and nothing else. A listing's own
+    ``low_stock_threshold`` drives its ``is_low_stock`` badge but does NOT filter this list;
+    letting it do so meant raising the threshold could never surface a listing that had its own
+    threshold set, which read as "the filter is broken".
+
+    ``groups`` is the ONLY carrier of listings. An earlier revision also returned a flattened
+    ``items`` mirror of the same rows; it was dropped because it doubled a 30s-polled payload
+    (a ListingOut is ~30 fields) and gave the response two sources of truth that could drift.
+    The card's "(N)" counter sums the group lengths instead.
     """
     floor: int
-    items: list[ListingOut]
+    groups: list[LowStockGroup]
 
 
 # ----------------------------- PUBLIC storefront (any buyer's view of any seller) -----------------------------

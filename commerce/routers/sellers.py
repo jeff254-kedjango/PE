@@ -374,21 +374,38 @@ def my_low_stock(
     db: Session = Depends(get_db),
     principal: CommercePrincipal = Depends(_require_write),
 ) -> schemas.LowStockOut:
-    """The caller's active PRODUCT listings at or below the reorder signal (§8 Chunk E2).
+    """The caller's active PRODUCT listings at or below the threshold (§8 Chunk E2).
 
-    ``floor`` (default 5) is the shop-wide backstop applied to listings whose per-item
-    ``low_stock_threshold`` is 0 (unset). Listings with a threshold set > 0 use THAT
-    threshold instead — the seller's own opinion always beats the default.
+    ``floor`` (default 5) is absolute: a listing appears when ``stock_qty <= floor`` and for
+    no other reason. Set it to 5 and you get every product with 5 or fewer in stock.
 
-    Ordered ascending by stock (most-urgent first). Excludes posts (no inventory) and
-    inactive listings.
+    Grouped by shop (a seller with several shops gets a header per shop), most-urgent-first
+    within each group. Excludes posts (no inventory) and inactive listings.
     """
     if floor < 0:
         floor = 0
     if not (1 <= limit <= 200):
         limit = 50
     items = catalog.low_stock_listings(db, principal.sub, floor=floor, limit=limit)
-    return schemas.LowStockOut(floor=floor, items=[schemas.to_listing_out(li) for li in items])
+    out_items = [schemas.to_listing_out(li) for li in items]
+
+    # Shop names in ONE batched query (no N+1), then a single ordered pass to group. The service
+    # already ordered by shop_id, so consecutive runs share a shop — grouping is O(n), and the
+    # emitted group order follows that ordering deterministically.
+    names = catalog.shop_meta(db, sorted({li.shop_id for li in out_items}))
+    groups: list[schemas.LowStockGroup] = []
+    for li in out_items:
+        if not groups or groups[-1].shop_id != li.shop_id:
+            meta = names.get(li.shop_id)
+            groups.append(schemas.LowStockGroup(
+                shop_id=li.shop_id,
+                # A listing always has a live shop; default defensively rather than 500.
+                shop_name=meta[0] if meta else "Shop",
+                items=[],
+            ))
+        groups[-1].items.append(li)
+
+    return schemas.LowStockOut(floor=floor, groups=groups)
 
 
 @router.get("/shops/mine", response_model=schemas.StorefrontOut)

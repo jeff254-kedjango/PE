@@ -503,14 +503,19 @@ def bulk_update_stock(db: Session, user_uuid: str, csv_text: str) -> BulkStockRe
 def low_stock_listings(
     db: Session, user_uuid: str, *, floor: int = 5, limit: int = 50,
 ) -> list[Listing]:
-    """Return the caller's active PRODUCT listings whose stock is at or below the reorder
-    signal — sorted ascending by stock (most-urgent first).
+    """Return the caller's active PRODUCT listings at or below ``floor`` — sorted ascending by
+    stock (most-urgent first), then grouped per-shop by the caller.
 
-    A listing is low-stock when EITHER its per-listing ``low_stock_threshold`` is set (> 0)
-    and ``stock_qty <= low_stock_threshold``, OR — for listings that haven't set a threshold
-    — a shop-wide floor applies (default 5). The floor is a caller-supplied backstop; sellers
-    who prefer per-listing precision leave the shop-wide floor unused simply by setting
-    thresholds on every listing.
+    The rule is deliberately absolute: **a listing is low when ``stock_qty <= floor``**. Nothing
+    else participates. Set the card's Threshold to 5 and you see every product with 5 or fewer
+    in stock — no exceptions, no rows above the number, no rows mysteriously missing.
+
+    A previous revision instead treated a per-listing ``low_stock_threshold > 0`` as an
+    EXCLUSIVE replacement for the floor, so a listing that had its own threshold was matched
+    *only* against that threshold. Raising the card's Threshold could then never surface it
+    (stock 8 with own-threshold 2 stayed hidden at floor=10), which is precisely the bug the
+    seller hit. ``low_stock_threshold`` still drives the per-listing ``is_low_stock`` badge in
+    ``schemas.catalog.to_listing_out`` — it is not dead, it simply no longer filters THIS list.
 
     Excludes:
       * POSTS — they have no inventory (post_kind='post', stock_qty stays 0), and would
@@ -531,21 +536,17 @@ def low_stock_listings(
     if seller is None:
         return []
 
-    # A listing is "low" when either its OWN threshold triggers (stock_qty <= threshold, and the
-    # threshold is > 0 to indicate the seller enabled it), OR the shop-wide floor applies to a
-    # listing whose threshold is 0 (unset). Expressed as one WHERE — no per-row Python filtering.
+    # One indexed range scan, no per-row Python filtering. Ordered by shop first so the caller
+    # can group without a second pass or a sort, then most-urgent-first WITHIN each shop.
     return (
         db.query(Listing)
         .filter(
             Listing.seller_id == seller.id,
             Listing.is_active == True,   # noqa: E712 — SQLAlchemy comparison
             Listing.post_kind == POST_KIND_PRODUCT,
-            (
-                ((Listing.low_stock_threshold > 0) & (Listing.stock_qty <= Listing.low_stock_threshold))
-                | ((Listing.low_stock_threshold == 0) & (Listing.stock_qty <= floor))
-            ),
+            Listing.stock_qty <= floor,
         )
-        .order_by(Listing.stock_qty.asc(), Listing.id.asc())
+        .order_by(Listing.shop_id.asc(), Listing.stock_qty.asc(), Listing.id.asc())
         .limit(limit)
         .all()
     )

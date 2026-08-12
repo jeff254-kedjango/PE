@@ -161,6 +161,72 @@ describe('ViewingCard — live tab (C+)', () => {
     await screen.findByTestId('viewing-card-viewer-row');
     // The fallback contains the uppercased initial.
     expect(screen.getByText('Z')).toBeInTheDocument();
+    // No <img> at all — an absent avatar must not leave a broken request behind.
+    expect(screen.queryByTestId('viewing-card-viewer-avatar')).not.toBeInTheDocument();
+  });
+
+  it('resolves a RELATIVE avatar path against the backend origin, not the app origin', async () => {
+    // The bug this guards: weespas stores avatars relative (/uploads/avatars/x.webp) and
+    // commerce passes them through verbatim. Rendered raw, the browser resolves them against
+    // the Vite dev origin (:5174) rather than the backend (:8000) — there is no dev proxy — so
+    // EVERY real viewer photo 404s. resolveMediaUrl is what makes the path absolute.
+    mockLive.mockResolvedValue(liveOut([
+      viewer({ session_id: 's1', display_name: 'Alice', avatar_url: '/uploads/avatars/a.webp' }),
+    ]));
+    renderCard();
+    const img = await screen.findByTestId('viewing-card-viewer-avatar');
+    // Absolute, and pointing at the API origin — never a bare path.
+    expect(img.getAttribute('src')).toMatch(/^https?:\/\//);
+    expect(img.getAttribute('src')).toMatch(/\/uploads\/avatars\/a\.webp$/);
+  });
+
+  it('leaves an already-absolute avatar URL untouched', async () => {
+    const abs = 'https://cdn.example.com/faces/bob.jpg';
+    mockLive.mockResolvedValue(liveOut([
+      viewer({ session_id: 's1', display_name: 'Bob', avatar_url: abs }),
+    ]));
+    renderCard();
+    const img = await screen.findByTestId('viewing-card-viewer-avatar');
+    expect(img).toHaveAttribute('src', abs);
+  });
+
+  it('shows a shimmering monogram placeholder until the avatar image loads', async () => {
+    mockLive.mockResolvedValue(liveOut([
+      viewer({ session_id: 's1', display_name: 'Carol', avatar_url: '/uploads/avatars/c.webp' }),
+    ]));
+    renderCard();
+    const img = await screen.findByTestId('viewing-card-viewer-avatar');
+    // Pre-load: the monogram is mounted under the (transparent) image and the wrap carries the
+    // shared `.skeleton` shimmer, so the row never renders an empty 40px hole.
+    expect(screen.getByText('C')).toBeInTheDocument();
+    expect(img.className).toMatch(/--pending/);
+    expect(img.parentElement?.className).toMatch(/skeleton/);
+
+    fireEvent.load(img);
+
+    // Post-load: shimmer and ghost monogram both retire; only the photo remains.
+    await waitFor(() => expect(img.className).not.toMatch(/--pending/));
+    expect(img.parentElement?.className).not.toMatch(/skeleton/);
+    expect(screen.queryByText('C')).not.toBeInTheDocument();
+  });
+
+  it('falls back to the monogram when the avatar image FAILS to load', async () => {
+    // Distinct from "no avatar_url": here weespas gave us a URL but it 404s (deleted media,
+    // wrong origin, hotlink block). Without an onError handler the row kept an empty circle,
+    // and a viewer with no photo looked identical to one whose photo was broken.
+    mockLive.mockResolvedValue(liveOut([
+      viewer({ session_id: 's1', display_name: 'Dave', avatar_url: '/uploads/avatars/gone.webp' }),
+    ]));
+    renderCard();
+    const img = await screen.findByTestId('viewing-card-viewer-avatar');
+
+    fireEvent.error(img);
+
+    // The image is gone entirely (not just hidden) and the monogram stands in its place.
+    await waitFor(() =>
+      expect(screen.queryByTestId('viewing-card-viewer-avatar')).not.toBeInTheDocument(),
+    );
+    expect(screen.getByTestId('viewing-card-viewer-initial')).toHaveTextContent('D');
   });
 
   it('shows the empty state when no one is viewing', async () => {

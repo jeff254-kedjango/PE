@@ -151,6 +151,67 @@
   color: var(--color-text-secondary, #6b7280);
 }
 
+/* Positioning context that holds the monogram and the (lazily-loaded) image in the SAME 40px
+   circle, so the row's geometry is identical in all three avatar states — no reflow when a face
+   arrives. Carries `.skeleton` (styles/animations.css) while pending, which supplies the shared
+   shimmer gradient rather than a second bespoke keyframe. */
+.viewing-card__viewer-avatar-wrap {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* Only while pending: the .skeleton gradient must not sit behind a loaded photo (a transparent
+   PNG would shimmer through it). Once loaded the wrap drops .skeleton entirely, so this rule
+   exists purely to hold the placeholder tint under the monogram. */
+.viewing-card__viewer-avatar-wrap--loading {
+  background-color: var(--color-border-subtle, #f3f4f6);
+}
+
+/* The monogram shown UNDER the loading image. Absolutely positioned so it occupies the circle
+   without adding a second flex item to the row. */
+.viewing-card__viewer-avatar-ghost {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+/* Inside the wrap the image fills the circle; the wrap owns the sizing. */
+.viewing-card__viewer-avatar-wrap .viewing-card__viewer-avatar {
+  position: relative;
+  display: block;
+  background: none;   /* the wrap paints the placeholder — avoid double-tinting a transparent PNG */
+}
+
+/* Hidden (not display:none — that can cancel the load in some engines) until decoded, so a
+   half-painted image never flashes over the monogram. Fades in to soften the swap. */
+.viewing-card__viewer-avatar--pending {
+  opacity: 0;
+}
+
+.viewing-card__viewer-avatar {
+  transition: opacity var(--duration-normal, 200ms) var(--ease-out, ease-out);
+}
+
+/* Respect a reduced-motion preference: keep the placeholder tint, drop the animation. The
+   shared `.skeleton` rule animates unconditionally, so this card opts its own avatars out. */
+@media (prefers-reduced-motion: reduce) {
+  .viewing-card__viewer-avatar-wrap--loading {
+    animation: none;
+  }
+  .viewing-card__viewer-avatar {
+    transition: none;
+  }
+}
+
 .viewing-card__viewer-meta {
   display: flex;
   flex-direction: column;

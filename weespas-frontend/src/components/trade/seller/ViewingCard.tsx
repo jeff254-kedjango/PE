@@ -29,6 +29,7 @@ import {
   usePromoteAllShop,
 } from '../../../hooks/useShopViewers';
 import type { CommerceSession, LiveViewerOut, ShopOut } from '../../../api/commerce';
+import { resolveMediaUrl } from '../../../utils/media';
 import './ViewingCard.css';
 
 type Tab = 'live' | 'history';
@@ -53,6 +54,74 @@ function avatarInitial(name: string): string {
   return first ? first.toUpperCase() : '·';
 }
 
+/** The viewer's profile picture, or their monogram.
+ *
+ *  Three states, because a remote image has three outcomes and each needs its own treatment:
+ *
+ *    1. **No URL** (anonymous viewer, bridge unavailable, or a weespas user who never uploaded)
+ *       → monogram immediately. Not a failure, just an absence.
+ *    2. **URL present, still loading** → the monogram sits under a shimmer. A viewer row is
+ *       ~40px of avatar next to text; an unstyled empty circle popping into a face is the
+ *       jarring layout flash `loading="lazy"` otherwise buys us.
+ *    3. **URL present, load FAILED** (404, offline media dir, hotlink block) → fall back to the
+ *       monogram permanently. This is the case that was broken: without an `onError` the row
+ *       kept an empty hole where a face should be, and the seller had no way to tell a viewer
+ *       with no picture apart from one whose picture didn't load.
+ *
+ *  `resolveMediaUrl` is the reason this exists at all. weespas stores avatars RELATIVE
+ *  (`/uploads/avatars/x.webp`, see weespas/routers/me.py) and commerce passes the value
+ *  straight through, so a raw `src` resolves against the Vite dev origin (:5174) instead of
+ *  the backend (:8000) — there is no dev proxy — and every real avatar 404s. Same helper +
+ *  same error-fallback contract as `ShopAvatar`, so the two surfaces can't drift. */
+const ViewerAvatar: React.FC<{ v: LiveViewerOut }> = ({ v }) => {
+  const [broken, setBroken] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const resolved = resolveMediaUrl(v.avatar_url);
+  const initial = avatarInitial(v.display_name);
+
+  if (!resolved || broken) {
+    return (
+      <span
+        className="viewing-card__viewer-avatar viewing-card__viewer-avatar--fallback"
+        aria-hidden
+        data-testid="viewing-card-viewer-initial"
+      >
+        {initial}
+      </span>
+    );
+  }
+
+  // The monogram stays mounted UNDER the image until it loads, so the row never shows an
+  // empty circle: shimmer + initial first, real face second. Once loaded the img is opaque
+  // and covers it. Both are aria-hidden — the adjacent name is the accessible identity.
+  return (
+    <span
+      className={
+        loaded
+          ? 'viewing-card__viewer-avatar-wrap'
+          : 'viewing-card__viewer-avatar-wrap viewing-card__viewer-avatar-wrap--loading skeleton'
+      }
+      aria-hidden
+    >
+      {!loaded && <span className="viewing-card__viewer-avatar-ghost">{initial}</span>}
+      <img
+        className={
+          loaded
+            ? 'viewing-card__viewer-avatar'
+            : 'viewing-card__viewer-avatar viewing-card__viewer-avatar--pending'
+        }
+        src={resolved}
+        alt=""              /* decorative — the name is already shown below */
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        onError={() => setBroken(true)}
+        data-testid="viewing-card-viewer-avatar"
+      />
+    </span>
+  );
+};
+
 const ViewerRow: React.FC<{ v: LiveViewerOut }> = ({ v }) => {
   const areaBits: string[] = [];
   if (v.area_label) areaBits.push(v.area_label);
@@ -61,18 +130,7 @@ const ViewerRow: React.FC<{ v: LiveViewerOut }> = ({ v }) => {
     : 'browsing storefront';
   return (
     <li className="viewing-card__viewer" data-testid="viewing-card-viewer-row">
-      {v.avatar_url ? (
-        <img
-          className="viewing-card__viewer-avatar"
-          src={v.avatar_url}
-          alt=""              /* decorative — the name is already shown below */
-          loading="lazy"
-        />
-      ) : (
-        <span className="viewing-card__viewer-avatar viewing-card__viewer-avatar--fallback" aria-hidden>
-          {avatarInitial(v.display_name)}
-        </span>
-      )}
+      <ViewerAvatar v={v} />
       <div className="viewing-card__viewer-meta">
         <span className="viewing-card__viewer-name">
           {v.display_name}

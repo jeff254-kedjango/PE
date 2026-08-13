@@ -301,6 +301,28 @@ class Settings(BaseSettings):
     trending_demo_center_lng: float = 36.7870
     trending_demo_jitter_deg: float = 0.01
 
+    # ── Live-viewer DEMO seeder (services/viewer_demo.py, run via PE/dev/commerce-viewer-demo.sh)
+    # Keeps a rotating population of LIVE viewers on every real shop so the seller console's
+    # Viewing Card has something to show in a dev stack. Same double-gate as the trending seeder:
+    # this flag defaults False AND run_forever() hard-refuses under is_production().
+    #
+    # It MUST be a looping process, not a one-shot script: shop_views.LIVE_WINDOW_SECONDS is 60, so
+    # a seeded viewer disappears 60s after its last heartbeat. The loop re-heartbeats instead.
+    #
+    # Viewer IDENTITIES are real weespas user uuids (read-only, from the weespas DB) rather than
+    # fabricated ones — commerce stores only an opaque viewer_uuid and the Viewing Card resolves
+    # names/avatars over the S2S bridge. A made-up uuid resolves to nothing and every row would
+    # render as 'Guest', defeating the point of seeding.
+    #   * refresh seconds: must stay comfortably UNDER LIVE_WINDOW_SECONDS or the population will
+    #     visibly flicker between ticks as rows age out before being refreshed.
+    #   * viewers_per_shop: how many concurrent live viewers each shop shows.
+    #   * churn: how many of those slots are replaced with a different viewer each tick, so the
+    #     card demonstrates arrivals/departures instead of a frozen list. 0 = a static population.
+    viewer_demo_enabled: bool = False
+    viewer_demo_refresh_seconds: int = 20
+    viewer_demo_viewers_per_shop: int = 4
+    viewer_demo_churn_per_tick: int = 1
+
     # §8 Chunk C+ — commerce → weespas S2S bridge for humanized live viewers. Both settings
     # must be present for the /shops/{id}/live-viewers endpoint to hydrate viewer identity;
     # missing config means graceful degradation (every viewer shown as 'Guest', no crash).

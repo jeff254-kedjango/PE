@@ -207,9 +207,12 @@ class Settings(BaseSettings):
     # constant-time. NOT used for any user-facing endpoint — only the one S2S surface.
     #
     # Blank ⇒ the bridge is DISABLED (weespas returns 503 on the endpoint). This is fail-closed:
-    # a dev env without the secret configured must not silently accept a wrong-secret call. Set
-    # a matching value on both services (WEESPAS_COMMERCE_USERS_LOOKUP_SECRET and
-    # COMMERCE_WEESPAS_USERS_LOOKUP_SECRET) to enable.
+    # a dev env without the secret configured must not silently accept a wrong-secret call.
+    #
+    # To enable, set the SAME value on both services: here as env COMMERCE_USERS_LOOKUP_SECRET,
+    # and on commerce as env WEESPAS_USERS_LOOKUP_SECRET (each service's var is named for the
+    # PEER it authenticates, which is why the two names differ). PE/dev/dev.env sets both from
+    # one place in local dev.
     commerce_users_lookup_secret: str = ""
     # S2S read timeout (seconds) for the shops-on-map aggregator's call to commerce
     # (services.commerce_read_client). Kept short: the map must never hang or go dark on a

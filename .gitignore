@@ -20,6 +20,13 @@
 *.pfx
 *.crt
 dev/dev.env
+# Timestamped backups the launchers/rotation leave behind (dev.env.bak-<epoch>) hold the SAME
+# live secrets as dev.env itself. The `.env.*` rule above does NOT cover them: gitignore matches
+# on the basename, and `dev.env.bak-…` does not begin with `.env.`, so these were tracked-able
+# until this rule existed. Glob the whole suffix space rather than the .bak- prefix — an ad-hoc
+# `dev.env.save` or `dev.env.20260812` must not slip through either.
+dev/dev.env.*
+!dev/dev.env.example
 secrets/
 
 # --- Python ---

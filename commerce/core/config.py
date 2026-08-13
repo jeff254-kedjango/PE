@@ -307,10 +307,14 @@ class Settings(BaseSettings):
     #
     # weespas_url:                the base origin (no /api prefix) of the weespas service.
     #                              e.g. http://localhost:8000 in dev.
-    # weespas_users_lookup_secret: matches the WEESPAS_COMMERCE_USERS_LOOKUP_SECRET on
-    #                              weespas. Blank ⇒ the bridge is DISABLED and every viewer
-    #                              shown as 'Guest' (fail-open on identity, fail-closed on
-    #                              the bridge itself: an unset secret NEVER makes a call).
+    # weespas_users_lookup_secret: the shared secret. Set the SAME value on both services:
+    #                              here as env WEESPAS_USERS_LOOKUP_SECRET, and on weespas as
+    #                              env COMMERCE_USERS_LOOKUP_SECRET (each service's var is
+    #                              named for the PEER it authenticates). PE/dev/dev.env sets
+    #                              both from one place in local dev.
+    #                              Blank ⇒ the bridge is DISABLED and every viewer shown as
+    #                              'Guest' (fail-open on identity, fail-closed on the bridge
+    #                              itself: an unset secret NEVER makes a call).
     # weespas_lookup_timeout_s:    hard httpx timeout. Deliberately short — a hung weespas
     #                              must never make the seller's card unresponsive; a
     #                              timeout is treated the same as a bridge outage

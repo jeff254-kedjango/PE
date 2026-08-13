@@ -9,14 +9,28 @@ from PE.weespas.models.property import Agent, PropertyImage, PropertyVideo
 from PE.weespas.models.user import User
 
 
-def _optimize_one(file_path: str) -> Path | None:
-    """Convert a single image to WebP. Returns the output path, or None on failure."""
+def _optimize_one(file_path: str, *, max_edge: int | None = None) -> Path | None:
+    """Convert a single image to WebP. Returns the output path, or None on failure.
+
+    ``max_edge`` bounds the LONGEST side, preserving aspect ratio; ``None`` (the default) keeps
+    the source dimensions. It defaults to None because property images are viewed full-screen in
+    a lightbox and must stay large — only callers that know their display ceiling pass a value.
+
+    ``thumbnail()`` (not ``resize()``) is deliberate: it is a no-op when the image is already
+    within bounds, so a small upload is never UPscaled into a blurry, larger file. It also
+    preserves aspect ratio without us computing the second edge.
+    """
     path = Path(file_path)
     if not path.exists():
         return None
     output_path = path.with_suffix(".webp")
     with Image.open(path) as img:
-        img.convert("RGB").save(output_path, "WEBP", quality=80)
+        img = img.convert("RGB")
+        if max_edge is not None:
+            # LANCZOS is the right filter for large downscale ratios (a 4160px source to 256px is
+            # ~16x); the cheaper default would alias badly on facial detail at avatar sizes.
+            img.thumbnail((max_edge, max_edge), Image.LANCZOS)
+        img.save(output_path, "WEBP", quality=80)
     return output_path
 
 
@@ -128,6 +142,17 @@ def process_property_video(file_path: str, video_id: int): # Added video_id here
 #
 # Routed to the existing `media` queue so we don't add a new worker
 # topology. Single DB session, single commit — no extra round-trips.
+#
+# Longest edge of a stored avatar. The largest avatar rendered anywhere in the frontend is 110px
+# (audited across every avatar rule in weespas-frontend/src), so 256 covers it at 2x for retina
+# with headroom, and no display surface can be upscaling from this.
+#
+# This bound exists because it was missing: avatars were stored at whatever the camera produced —
+# real data showed up to 4160x6240 and a 787 KB mean — then served into a 40px circle on the
+# seller console's Viewing Card. Ten live viewers pulled several MB to paint ten thumbnails.
+AVATAR_MAX_EDGE = 256
+
+
 @celery_app.task(name="process_avatar_image", queue="media")
 def process_avatar_image(file_path: str, user_id: str):
     """Transcode an uploaded avatar to WebP and update the user row.
@@ -150,8 +175,13 @@ def process_avatar_image(file_path: str, user_id: str):
     long-term steady-state is two files per user-with-an-avatar — a few
     hundred KB each — utterly negligible against the win of never
     serving a broken image.
+
+    The WebP variant is also DOWNSCALED to AVATAR_MAX_EDGE. Doing it here rather than in the
+    endpoint keeps POST /me/avatar sub-50ms — this worker already decodes the image to transcode
+    it, so bounding the size costs nothing extra. The full-resolution source stays on disk for
+    the cache-coherence reason above, and is swept by the next upload's `{user_id}-*` glob.
     """
-    output_path = _optimize_one(file_path)
+    output_path = _optimize_one(file_path, max_edge=AVATAR_MAX_EDGE)
     if output_path is None:
         return "missing"
 

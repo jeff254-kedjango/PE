@@ -1,4 +1,5 @@
 import logging
+import mimetypes
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -133,6 +134,20 @@ app.include_router(flag_reviews_router, prefix="/api/v1", tags=["flag-reviews"])
 app.include_router(commerce_router, prefix="/api/v1", tags=["commerce"])
 
 # Serve uploaded files (images, videos)
+#
+# WebP MUST be registered before the mount. StaticFiles derives Content-Type from
+# `mimetypes.guess_type`, and CPython's table has no .webp entry on this interpreter
+# (verified: 3.10 returns None), so every .webp fell back to `text/plain; charset=utf-8`.
+# WebP is our PREFERRED stored format — routers/media.py transcodes to it and both upload
+# paths accept image/webp — so this mislabels the bulk of served media, avatars included.
+#
+# It renders today only because no response sets `X-Content-Type-Options: nosniff`; browsers
+# sniff the magic bytes and show the image anyway. That makes it a latent trap: adding nosniff
+# (a routine hardening step) would instantly break every WebP image site-wide, with no code
+# change anywhere near the images. Registering the real type removes the dependence on sniffing.
+#
+# `mimetypes.add_type` is idempotent and process-local — it cannot leak to other services.
+mimetypes.add_type("image/webp", ".webp")
 _uploads_dir = Path("uploads")
 _uploads_dir.mkdir(exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(_uploads_dir)), name="uploads")

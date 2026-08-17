@@ -92,10 +92,16 @@ W_RATING = 0.12         # buyer-side trust
 W_TENURE = 0.08         # survivorship; weakest term — age alone doesn't repay a loan
 
 # Revenue saturation point for the revenue sub-score. A shop at or above this in the 90-day
-# window scores 1.0 on that term. Absolute by design (see doctrine 1): KES 1,000,000 over 90
-# days ≈ KES 11k/day, a solidly-performing Nairobi MSME. Above that, more revenue no longer
-# changes the credit question — the constraint becomes the lender's appetite, not the shop.
-REVENUE_SATURATION_CENTS = 1_000_000 * 100
+# window scores 1.0 on that term. Absolute by design (see doctrine 1).
+#
+# Set at KES 150,000 over 90 days (KES 50k/month) — USER DECISION 2026-08-17. The previous
+# KES 1,000,000/90d ceiling sat at the very top of the estate-shop band (measured against Kenyan
+# kiosk/duka turnover: ~KES 25k–120k/month, well-stocked shops 60k–300k/month), so only the top
+# ~5% of the population could ever fill the bar and the rest read as permanently weak on the
+# term that carries 40% of the weight. KES 50k/month is the lower-middle of a working
+# neighbourhood shop: below it a business is genuinely fledgling, at or above it revenue has
+# stopped being the differentiator and the other components carry the picture.
+REVENUE_SATURATION_CENTS = 150_000 * 100
 
 # Tenure saturation. Two years of trading is treated as fully seasoned; beyond it, age adds
 # nothing to the credit question.

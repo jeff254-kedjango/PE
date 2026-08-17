@@ -23,12 +23,12 @@ WHAT THE REAL DATA DICTATES (measured 2026-08-14, not assumed):
 
   * **Sale amounts are NOT ours to choose.** ``open_order`` on a ``fixed`` listing locks at the
     listing's own price. Only the 11 ``bargain`` listings allow a negotiated number. So a shop's
-    revenue is a function of its actual catalogue: Elite Kicks averages KES 23.6k/item and needs
-    ~42 sales to saturate the revenue term, while the bakery averages KES 422 and would need
-    ~2,366. Per the user's decision, volumes stay BELIEVABLE and the revenue bar therefore
-    reflects the real catalogue — a cheap-stock shop scores lower on revenue and leans on
-    fulfilment/repeat/rating instead. That is the honest picture, and it exercises the component
-    bars far harder than a demo where every shop scores alike.
+    revenue is a function of its actual catalogue. The revenue term saturates at KES 150k/90d
+    (USER DECISION 2026-08-17: KES 50k/month — a working neighbourhood shop, measured against
+    Kenyan estate-shop turnover), so Elite Kicks (KES 23.6k avg item) fills the revenue bar in
+    ~7 sales while the bakery (KES 422 avg) needs ~355. Volumes stay BELIEVABLE, so the
+    strongest catalogues saturate on revenue and the honest differentiation comes from
+    fulfilment/repeat/rating — the right picture for shops whose cash flow is small but real.
   * **Failed orders can only come from ``bargain`` listings.** A ``fixed`` order jumps straight to
     ``PRICE_LOCKED``, which is not in ``OPEN_STATUSES``, so ``cancel()`` refuses it — by design.
     Fulfilment therefore has to be degraded through the negotiation path, and a shop's failed count

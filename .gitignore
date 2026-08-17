@@ -70,6 +70,8 @@ backup_*.sql
 # --- Logs & scratch ---
 *.log
 *.out
+# Agent/IDE scratch dir (preview run docs, dev-server logs, thread state) — never source.
+.freebuff/
 
 # --- OS / editor cruft ---
 .DS_Store

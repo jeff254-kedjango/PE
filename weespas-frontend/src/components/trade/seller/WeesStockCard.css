@@ -1,10 +1,14 @@
-/* WeesStockCard — LEFT column of /trade/sell. Same calm-admin chrome as RankingCard and
- * LowStockCard so the column reads as one surface.
+/* WeesStockCard — LEFT column of /trade/sell.
  *
- * Hierarchy differs from RankingCard on purpose. There, the rank number IS the message, so it
- * dominates. Here the component bars are the message (doctrine 1: components are the product,
- * the composite is a sort key), so the score is present but restrained — it must not out-shout
- * the breakdown that explains it. */
+ * Styled as a finance quote (the WeesStock instrument, user direction 2026-08-17): the score
+ * reads as the headline "price", a labelled momentum chip sits under it, the component bars are
+ * the breakdown, and the facts are a stats grid. It stays inside the same calm-admin chrome as
+ * RankingCard/LowStockCard — same tokens, no new palette.
+ *
+ * Doctrine 1 still governs the hierarchy: the component bars are the message (components are
+ * the product, the composite is a sort key). The score is the hero number of a quote page, but
+ * the breakdown that explains it is never hidden behind it — on a thin file it is the ONLY
+ * signal, so it renders even when the composite is withheld. */
 
 .weesstock-card {
   display: flex;
@@ -12,7 +16,7 @@
   gap: var(--space-4, 16px);
   padding: var(--space-4, 16px);
   border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: var(--radius-lg, 12px);
+  border-radius: 16px;
   background: var(--color-surface, #ffffff);
 }
 
@@ -25,13 +29,16 @@
 
 .weesstock-card__title {
   font-size: var(--fs-md, 16px);
-  font-weight: 600;
+  font-weight: 700;
   margin: 0;
   color: var(--color-text-strong, #111827);
 }
 
+/* Market-context line, in the idiom of a quote header ("INX · S&P INDICES · DELAYED"). */
 .weesstock-card__hint {
-  font-size: var(--fs-xs, 12px);
+  font-size: var(--fs-2xs, 11px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--color-text-muted, #6b7280);
 }
 
@@ -54,11 +61,17 @@
   color: var(--color-danger, #b91c1c);
 }
 
-/* ---- composite ---- */
+/* ---- composite: the quote block ---- */
 
 .weesstock-card__score-row {
   display: flex;
   align-items: baseline;
+  gap: var(--space-2, 8px);
+}
+
+.weesstock-card__quote {
+  display: flex;
+  flex-direction: column;
   gap: var(--space-2, 8px);
 }
 
@@ -69,18 +82,54 @@
 }
 
 .weesstock-card__score-value {
-  font-size: var(--fs-2xl, 32px);
+  font-size: 44px;
   font-weight: 700;
   line-height: 1;
   color: var(--color-text-strong, #111827);
-  /* Tabular figures: the score refreshes in place every 5 min, and proportional digits make
-     the number visibly jitter as it re-renders. */
+  /* Tabular figures: the score refreshes in place, and proportional digits make the number
+     visibly jitter as it re-renders. */
   font-variant-numeric: tabular-nums;
 }
 
 .weesstock-card__score-max {
   font-size: var(--fs-sm, 14px);
+  font-weight: 500;
   color: var(--color-text-muted, #6b7280);
+}
+
+/* Momentum chip — finance-quote style: a bordered pill under the headline number, explicitly
+   labelled so the movement reads as REVENUE momentum, never as the score changing. */
+.weesstock-card__momentum {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  align-self: flex-start;
+  padding: 2px 8px;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 999px;
+  background: var(--color-surface-alt, #f3f4f6);
+}
+
+.weesstock-card__momentum-label {
+  font-size: var(--fs-2xs, 11px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+.weesstock-card__trend {
+  font-size: var(--fs-xs, 12px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.weesstock-card__trend--up {
+  color: var(--color-success, #15803d);
+}
+
+/* Down is amber, not red: trading below your own 90-day average is a signal worth seeing, not
+   a failure. Red here would misread ordinary seasonality as an alarm. */
+.weesstock-card__trend--down {
+  color: var(--color-warning, #b45309);
 }
 
 /* Thin file. Deliberately NOT styled as an error or a warning — no red, no alert icon. A new
@@ -101,6 +150,17 @@
   margin: 0;
   font-size: var(--fs-sm, 14px);
   color: var(--color-text-secondary, #4b5563);
+}
+
+/* ---- section label (finance pages section their panels) ---- */
+
+.weesstock-card__section {
+  font-size: var(--fs-2xs, 11px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #6b7280);
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  padding-top: var(--space-3, 12px);
 }
 
 /* ---- component bars ---- */
@@ -156,24 +216,27 @@
   }
 }
 
-/* ---- supporting facts ---- */
+/* ---- supporting facts: quote-page stats grid ---- */
 
 .weesstock-card__facts {
   display: grid;
   /* Two columns on a wide left column, collapsing to one when the card is narrow. auto-fit
      keeps this responsive without a media query tied to a specific breakpoint. */
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: var(--space-2, 8px) var(--space-3, 12px);
+  gap: var(--space-3, 12px) var(--space-3, 12px);
   margin: 0;
+  padding-top: var(--space-3, 12px);
+  border-top: 1px solid var(--color-border, #e5e7eb);
 }
 
 .weesstock-card__fact dt {
-  font-size: var(--fs-xs, 12px);
+  font-size: var(--fs-2xs, 11px);
+  letter-spacing: 0.03em;
   color: var(--color-text-muted, #6b7280);
 }
 
 .weesstock-card__fact dd {
-  margin: 0;
+  margin: 2px 0 0;
   font-size: var(--fs-sm, 14px);
   font-weight: 600;
   color: var(--color-text-strong, #111827);
@@ -190,22 +253,6 @@
 .weesstock-card__fact-note {
   font-style: italic;
   color: var(--color-text-muted, #9ca3af);
-}
-
-.weesstock-card__trend {
-  margin-left: 4px;
-  font-weight: 700;
-  color: var(--color-text-muted, #6b7280);
-}
-
-.weesstock-card__trend--up {
-  color: var(--color-success, #15803d);
-}
-
-/* Down is amber, not red: trading below your own 90-day average is a signal worth seeing, not
-   a failure. Red here would misread ordinary seasonality as an alarm. */
-.weesstock-card__trend--down {
-  color: var(--color-warning, #b45309);
 }
 
 .weesstock-card__footnote {

@@ -113,14 +113,24 @@ const ProfileBody: React.FC<{ data: CreditProfileOut }> = ({ data }) => {
     <>
       <div className="weesstock-card__score-row">
         {scoreShown ? (
-          <div
-            className="weesstock-card__score"
-            aria-label={`Funding score ${Math.round((data.score as number) * SCORE_SCALE)} out of ${SCORE_SCALE}`}
-          >
-            <span className="weesstock-card__score-value" data-testid="weesstock-score">
-              {Math.round((data.score as number) * SCORE_SCALE)}
-            </span>
-            <span className="weesstock-card__score-max">/{SCORE_SCALE}</span>
+          <div className="weesstock-card__quote">
+            <div
+              className="weesstock-card__score"
+              aria-label={`Funding score ${Math.round((data.score as number) * SCORE_SCALE)} out of ${SCORE_SCALE}`}
+            >
+              <span className="weesstock-card__score-value" data-testid="weesstock-score">
+                {Math.round((data.score as number) * SCORE_SCALE)}
+              </span>
+              <span className="weesstock-card__score-max">/{SCORE_SCALE}</span>
+            </div>
+            {/* Finance-quote idiom: momentum sits under the headline number, labelled so it
+                reads as REVENUE movement — never as the score itself changing. */}
+            {data.revenue_trend !== null && (
+              <div className="weesstock-card__momentum">
+                <span className="weesstock-card__momentum-label">30d revenue momentum</span>
+                <TrendMark trend={data.revenue_trend} />
+              </div>
+            )}
           </div>
         ) : (
           <div className="weesstock-card__pending" role="status" data-testid="weesstock-pending">
@@ -132,6 +142,8 @@ const ProfileBody: React.FC<{ data: CreditProfileOut }> = ({ data }) => {
 
       {/* Always rendered, scoreable or not — doctrine 1. On a thin file these are the ONLY
           honest signal available, and they are exactly what tells a new seller where to push. */}
+      <span className="weesstock-card__section">Score breakdown</span>
+
       <ul className="weesstock-card__components" data-testid="weesstock-components">
         {data.components.map((c) => {
           // `weighted` is post-weight, so its ceiling is the weight itself. Normalising by the
@@ -163,10 +175,7 @@ const ProfileBody: React.FC<{ data: CreditProfileOut }> = ({ data }) => {
       <dl className="weesstock-card__facts">
         <div className="weesstock-card__fact">
           <dt>Verified sales · {data.window_days} days</dt>
-          <dd>
-            {money(data.revenue_cents, data.currency)}
-            <TrendMark trend={data.revenue_trend} />
-          </dd>
+          <dd>{money(data.revenue_cents, data.currency)}</dd>
         </div>
         <div className="weesstock-card__fact">
           <dt>Completed orders</dt>
@@ -209,8 +218,9 @@ const ProfileBody: React.FC<{ data: CreditProfileOut }> = ({ data }) => {
   );
 };
 
-/** Trend arrow for the recent run-rate. `null` means "no revenue to compare", which is a
- *  different statement from "flat" and must not draw an arrow at all. */
+/** Momentum chip for the recent run-rate — arrow + magnitude, in the finance idiom. `null`
+ *  means "no revenue to compare", which is a different statement from "flat" and must not
+ *  draw an arrow at all. */
 const TrendMark: React.FC<{ trend: number | null }> = ({ trend }) => {
   if (trend === null) return null;
   const delta = trend - 1;
@@ -225,7 +235,7 @@ const TrendMark: React.FC<{ trend: number | null }> = ({ trend }) => {
       title={up ? 'Selling faster than your 90-day average' : 'Selling slower than your 90-day average'}
       aria-label={up ? 'Trending up' : 'Trending down'}
     >
-      {up ? '↑' : '↓'}
+      {up ? '↑' : '↓'} {pct(delta)}
     </span>
   );
 };

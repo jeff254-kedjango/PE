@@ -36,6 +36,8 @@ const AgentsPage = lazy(() => import('./pages/AgentsPage'));
 const AgentProfilePage = lazy(() => import('./pages/AgentProfilePage'));
 const TradePage = lazy(() => import('./pages/TradePage'));
 const SellerConsolePage = lazy(() => import('./pages/SellerConsolePage'));
+const MarketsPage = lazy(() => import('./pages/MarketsPage'));
+const MarketDetailPage = lazy(() => import('./pages/MarketDetailPage'));
 // §8 storefront page — /shop/:key handles both the canonical shareable URL (/shop/@<handle>) and
 // the legacy fallback (/shop/<sellerId>). The "@" prefix inside the SAME param slot disambiguates
 // the two families — no route ordering ambiguity, no shadow matches.
@@ -377,6 +379,9 @@ const AppContent: React.FC = () => {
         <Route path="/trade" element={<RouteErrorBoundary><Suspense fallback={<RouteLoader />}><TradePage /></Suspense></RouteErrorBoundary>} />
         <Route path="/trade/sell" element={<RouteErrorBoundary><Suspense fallback={<RouteLoader />}><SellerConsolePage /></Suspense></RouteErrorBoundary>} />
         <Route path="/trade/sellers/:sellerId" element={<RouteErrorBoundary><Suspense fallback={<RouteLoader />}><TradePage /></Suspense></RouteErrorBoundary>} />
+        {/* WeesStock investor market (§F4) — discovery/analytics only, consent-gated. */}
+        <Route path="/markets" element={<RouteErrorBoundary><Suspense fallback={<RouteLoader />}><MarketsPage /></Suspense></RouteErrorBoundary>} />
+        <Route path="/markets/:sellerId" element={<RouteErrorBoundary><Suspense fallback={<RouteLoader />}><MarketDetailPage /></Suspense></RouteErrorBoundary>} />
         {/* §8 shop URL — ONE route, one component. The :key param carries either "@<handle>"
             (canonical shareable URL) or a bare sellerId (legacy fallback). ShopPage inspects the
             "@" prefix to pick the entry, and if a sellerId resolves to a shop with a handle it

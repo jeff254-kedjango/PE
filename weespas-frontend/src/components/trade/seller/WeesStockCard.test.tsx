@@ -1,17 +1,30 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// Mock the api module so the hook is exercised for real but the network is not.
+// Mock the api module so the hooks are exercised for real but the network is not.
 vi.mock('../../../api/commerce', async () => {
   const actual = await vi.importActual<typeof import('../../../api/commerce')>('../../../api/commerce');
-  return { ...actual, getMyCreditProfile: vi.fn() };
+  return {
+    ...actual,
+    getMyCreditProfile: vi.fn(),
+    getMarketListing: vi.fn(),
+    setMarketListing: vi.fn(),
+  };
 });
 
-import { getMyCreditProfile, type CommerceSession, type CreditProfileOut } from '../../../api/commerce';
+import {
+  getMyCreditProfile,
+  getMarketListing,
+  setMarketListing,
+  type CommerceSession,
+  type CreditProfileOut,
+} from '../../../api/commerce';
 import WeesStockCard from './WeesStockCard';
 
 const mockGet = vi.mocked(getMyCreditProfile);
+const mockGetListing = vi.mocked(getMarketListing);
+const mockSetListing = vi.mocked(setMarketListing);
 const SESSION: CommerceSession = { token: 'ctok', commerce_url: 'http://c' };
 
 /** A scoreable profile. Components mirror the server's weights so `weighted <= weight` holds,
@@ -89,6 +102,10 @@ function renderCard() {
 
 beforeEach(() => {
   mockGet.mockReset();
+  mockGetListing.mockReset();
+  mockSetListing.mockReset();
+  mockGetListing.mockResolvedValue({ listed: false });
+  mockSetListing.mockResolvedValue({ listed: true });
 });
 
 describe('WeesStockCard', () => {
@@ -216,5 +233,59 @@ describe('WeesStockCard', () => {
     expect(
       await screen.findByRole('alert', {}, { timeout: 3000 }),
     ).toHaveTextContent(/Couldn.t load your funding profile/i);
+  });
+});
+
+describe('WeesStockCard market listing (opt-in)', () => {
+  beforeEach(() => {
+    // A scoreable profile so the card body settles; these tests focus on the switch.
+    mockGet.mockResolvedValue(profile());
+  });
+
+  it('renders the consent switch from the SERVER state, off by default', async () => {
+    mockGetListing.mockResolvedValue({ listed: false });
+    renderCard();
+    await screen.findByTestId('weesstock-score');
+    // The switch's first paint must come from the server (never a client guess) — default off.
+    expect(screen.getByTestId('weesstock-listed')).not.toBeChecked();
+    expect(mockGetListing).toHaveBeenCalledWith(SESSION);
+  });
+
+  it('checks the switch when the seller is already listed', async () => {
+    mockGetListing.mockResolvedValue({ listed: true });
+    renderCard();
+    await screen.findByTestId('weesstock-score');
+    expect(await screen.findByTestId('weesstock-listed')).toBeChecked();
+  });
+
+  it('toggles consent on and persists the new state', async () => {
+    mockGetListing.mockResolvedValue({ listed: false });
+    renderCard();
+    const sw = await screen.findByTestId('weesstock-listed');
+    // The switch is disabled until the server flag settles — a click before that is a no-op.
+    await waitFor(() => expect(sw).toBeEnabled());
+    fireEvent.click(sw);
+    // The owner-only endpoint is the ONLY write path — no id, so it can only affect this seller.
+    await waitFor(() => expect(mockSetListing).toHaveBeenCalledWith(SESSION, true));
+  });
+
+  it('disables the switch when the flag cannot be read', async () => {
+    mockGetListing.mockRejectedValue(new Error('boom'));
+    renderCard();
+    const sw = await screen.findByTestId('weesstock-listed');
+    await screen.findByTestId('weesstock-score');
+    // An unreadable flag must render as "can't change this right now", never as a silent off.
+    expect(sw).toBeDisabled();
+  });
+
+  it('surfaces a failed consent write without pretending it succeeded', async () => {
+    mockSetListing.mockRejectedValue(new Error('boom'));
+    renderCard();
+    const sw = await screen.findByTestId('weesstock-listed');
+    await waitFor(() => expect(sw).toBeEnabled());
+    fireEvent.click(sw);
+    expect(
+      await screen.findByTestId('weesstock-listed-error'),
+    ).toHaveTextContent(/Couldn.t update your market listing/i);
   });
 });

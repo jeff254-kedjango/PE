@@ -16,6 +16,7 @@ import FeedKindToggle, { type TradeLane } from '../components/trade/FeedKindTogg
 // Chunk A: TradePage no longer mounts <Storefront> as an overlay. Tapping a seller navigates to
 // /shop/<sellerId>, which ShopPage resolves and canonicalizes to /shop/@<handle> when present.
 import TrendingRail from '../components/trade/TrendingRail';
+import MarketsSection from '../components/trade/MarketsSection';
 import ShopVideoStrip from '../components/trade/ShopVideoStrip';
 import VerticalVideoFeed from '../components/shorts/VerticalVideoFeed';
 import QuickBuys from '../components/trade/QuickBuys';
@@ -159,6 +160,16 @@ const TradePage: React.FC = () => {
               />
             </div>
 
+            {/* §WeesStock F4: the investor market, inline on the trade page — responsive
+                placement. On MOBILE/TABLET the section lives here in the feed column (the right
+                rail is hidden <1101px, so a rail-only mount would vanish); on DESKTOP (≥1101px)
+                this instance is CSS-hidden and the rail instance below takes over, matching the
+                three-column design [trending | feed | WeesStock Markets]. The 2×3 tile grid is
+                the glance surface; its header button opens the full /markets board (which
+                carries the regulatory label — this section links there rather than restating it
+                at tile size). */}
+            <MarketsSection session={session} />
+
             {sessionError && (
               <p className="trade-page__state trade-page__state--error" role="alert">
                 Couldn’t start a trade session. {sessionError.message}
@@ -208,6 +219,12 @@ const TradePage: React.FC = () => {
               "Search my location" always shows — it re-prompts / re-centres and is harmless once precise
               location is granted. Hidden <1100px with the rest of this column (TradePage.css). */}
           <aside className="trade-page__rail-right" aria-label="Trade controls" ref={railRightRef}>
+            {/* §WeesStock F4 — the DESKTOP instance of the market grid: the design's third column
+                [what's trending | feed | WeesStock Markets]. Hidden <1101px with the rail itself;
+                the feed-column instance covers those widths (see MarketsSection.css). The same
+                component mounted twice shares one React Query cache, so this adds no extra
+                fetch. */}
+            <MarketsSection session={session} />
             <button type="button" className="trade-page__rail-btn trade-page__rail-btn--ghost" onClick={requestLocation}>
               Search my location
             </button>

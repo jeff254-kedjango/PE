@@ -66,6 +66,8 @@ const SellerConsolePage: React.FC = () => {
           <h1>Sell on Weespas</h1>
         </div>
         <Link to="/trade" className="seller-btn seller-btn--ghost">View feed</Link>
+        {/* §F4: the investor market, one tap away from the seller's own WeesStock card. */}
+        <Link to="/markets" className="seller-btn seller-btn--ghost">View markets</Link>
       </header>
 
       {sessionLoading && <p className="seller-console__state">Connecting…</p>}

@@ -55,6 +55,9 @@ vi.mock('../components/trade/ShopVideoStrip', () => ({
 }));
 vi.mock('../components/trade/QuickBuys', () => ({ default: () => <div data-testid="quickbuys" /> }));
 vi.mock('../components/trade/FlashSales', () => ({ default: () => <div data-testid="flash" /> }));
+// MarketsSection fetches the live market board through useMarkets — stub it like the other heavy
+// rail children so the lane tests don't fire a network call.
+vi.mock('../components/trade/MarketsSection', () => ({ default: () => <div data-testid="markets-section" /> }));
 // §8 Chunk A: TradePage no longer imports <Storefront>. Tapping a seller navigates to /shop/...
 // which is a separate route (ShopPage). No overlay/sheet mounted here anymore; no mock needed.
 vi.mock('../components/shorts/VerticalVideoFeed', () => ({

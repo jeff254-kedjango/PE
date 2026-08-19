@@ -24,8 +24,21 @@
 // at will, so nothing self-generatable may move the score. Saying so on the card is what stops
 // it reading as an omission.
 import React from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCreditProfile } from '../../../hooks/useCreditProfile';
-import type { CommerceSession, CreditProfileOut } from '../../../api/commerce';
+import {
+  getMarketListing,
+  setMarketListing,
+  type CommerceSession,
+  type CreditProfileOut,
+} from '../../../api/commerce';
+import {
+  marketMoney,
+  marketPct,
+  marketTenure,
+  growthPrompt,
+  trendDelta,
+} from '../market/marketFormat';
 import './WeesStockCard.css';
 
 interface WeesStockCardProps {
@@ -37,57 +50,61 @@ interface WeesStockCardProps {
  *  a bank-style 300–850 bureau score, which it is not. */
 const SCORE_SCALE = 100;
 
-/** Trend deltas below this read as noise, not movement — a 3% swing over a 30-day window is
- *  ordinary week-to-week variation and must not be drawn as an arrow. */
-const TREND_FLAT_BAND = 0.05;
-
-/** Cents → "KSh 12,300", grouped and without decimals. Kenyan retail prices are quoted in
- *  whole shillings; cents exist in the ledger for exactness, not for display. */
-function money(cents: number, currency: string): string {
-  const major = Math.round(cents / 100);
-  return `${currency === 'KES' ? 'KSh' : currency} ${major.toLocaleString('en-KE')}`;
-}
-
-function pct(rate: number): string {
-  return `${Math.round(rate * 100)}%`;
-}
-
-/** Tenure in the largest honest unit. "428 days" is a number a seller has to convert; the
- *  point of the field is "how long have I been trading", which months and years answer. */
-function tenure(days: number): string {
-  if (days < 1) return 'New today';
-  if (days < 60) return `${Math.round(days)} day${Math.round(days) === 1 ? '' : 's'}`;
-  if (days < 730) return `${Math.floor(days / 30)} months`;
-  const years = Math.floor(days / 365);
-  return `${years} year${years === 1 ? '' : 's'}`;
-}
-
-/** Turn the server's machine-readable gate reasons into one sentence a seller can act on.
- *  The counts come from the server (orders_needed / days_needed) so the thresholds themselves
- *  are never duplicated in the client, where they could drift from the service constants. */
-function growthPrompt(data: CreditProfileOut): string {
-  const parts: string[] = [];
-  if (data.orders_needed > 0) {
-    parts.push(`${data.orders_needed} more completed sale${data.orders_needed === 1 ? '' : 's'}`);
-  }
-  if (data.days_needed > 0) {
-    parts.push(`${data.days_needed} more day${data.days_needed === 1 ? '' : 's'} of trading`);
-  }
-  if (parts.length === 0) return 'Building your funding score.';
-  return `${parts.join(' and ')} to unlock your funding score.`;
-}
+/** The seller's own WeesStock market consent — server is the source of truth for the switch's
+ *  first paint, never a client guess. 5 min cadence: a flag flip is a rare, slow event. */
+const LISTING_KEY = ['commerce', 'seller', 'weesstock-listing'] as const;
 
 const WeesStockCard: React.FC<WeesStockCardProps> = ({ session }) => {
   const { data, isLoading, isError, error } = useCreditProfile(session);
+  const qc = useQueryClient();
+
+  // §F4 opt-in: appearing on WeesStock Markets is the seller's OWN choice, default off. The
+  // switch reads the persisted flag from the server (never a stale guess) and flips it with
+  // the owner-only endpoint (there is no id parameter — it can only affect this seller).
+  const listingQuery = useQuery({
+    queryKey: [...LISTING_KEY, session?.commerce_url],
+    queryFn: () => getMarketListing(session!),
+    enabled: !!session,
+    staleTime: 300_000,
+    retry: 1,
+  });
+  const mutation = useMutation({
+    mutationFn: (listed: boolean) => setMarketListing(session!, listed),
+    onSuccess: (res) => qc.setQueryData([...LISTING_KEY, session?.commerce_url], res),
+  });
 
   return (
     <section className="weesstock-card" aria-labelledby="weesstock-card-title">
       <header className="weesstock-card__head">
         <h2 id="weesstock-card-title" className="weesstock-card__title">WeesStock</h2>
-        <span className="weesstock-card__hint" title="Your funding readiness, from verified sales">
-          Funding readiness
-        </span>
+        <div className="weesstock-card__head-right">
+          <span className="weesstock-card__hint" title="Your funding readiness, from verified sales">
+            Funding readiness
+          </span>
+          <label
+            className="weesstock-card__listed"
+            title={listingQuery.data?.listed
+              ? 'Your shop is visible to investors on WeesStock Markets'
+              : 'Show your shop to investors on WeesStock Markets (opt-in)'}
+          >
+            <input
+              type="checkbox"
+              role="switch"
+              data-testid="weesstock-listed"
+              checked={listingQuery.data?.listed ?? false}
+              disabled={listingQuery.isLoading || listingQuery.isError || mutation.isPending}
+              onChange={(e) => mutation.mutate(e.target.checked)}
+              aria-label="Listed on WeesStock Markets"
+            />
+            <span className="weesstock-card__listed-label">Listed on Markets</span>
+          </label>
+        </div>
       </header>
+      {mutation.isError && (
+        <p className="weesstock-card__listed-error" role="alert" data-testid="weesstock-listed-error">
+          Couldn’t update your market listing.
+        </p>
+      )}
 
       <div className="weesstock-card__body">
         {isLoading && (
@@ -131,6 +148,7 @@ const ProfileBody: React.FC<{ data: CreditProfileOut }> = ({ data }) => {
                 <TrendMark trend={data.revenue_trend} />
               </div>
             )}
+            
           </div>
         ) : (
           <div className="weesstock-card__pending" role="status" data-testid="weesstock-pending">
@@ -155,7 +173,7 @@ const ProfileBody: React.FC<{ data: CreditProfileOut }> = ({ data }) => {
             <li key={c.key} className="weesstock-card__component" data-testid="weesstock-component">
               <div className="weesstock-card__component-head">
                 <span className="weesstock-card__component-label">{c.label}</span>
-                <span className="weesstock-card__component-weight">{pct(c.weight)}</span>
+                <span className="weesstock-card__component-weight">{marketPct(c.weight)}</span>
               </div>
               <div
                 className="weesstock-card__bar"
@@ -163,7 +181,7 @@ const ProfileBody: React.FC<{ data: CreditProfileOut }> = ({ data }) => {
                 aria-valuenow={Math.round(filled * 100)}
                 aria-valuemin={0}
                 aria-valuemax={100}
-                aria-label={`${c.label}: ${pct(filled)} of its maximum`}
+                aria-label={`${c.label}: ${marketPct(filled)} of its maximum`}
               >
                 <div className="weesstock-card__bar-fill" style={{ width: `${filled * 100}%` }} />
               </div>
@@ -175,14 +193,14 @@ const ProfileBody: React.FC<{ data: CreditProfileOut }> = ({ data }) => {
       <dl className="weesstock-card__facts">
         <div className="weesstock-card__fact">
           <dt>Verified sales · {data.window_days} days</dt>
-          <dd>{money(data.revenue_cents, data.currency)}</dd>
+          <dd>{marketMoney(data.revenue_cents, data.currency)}</dd>
         </div>
         <div className="weesstock-card__fact">
           <dt>Completed orders</dt>
           <dd>
             {data.settled_orders}
             {data.failed_orders > 0 && (
-              <span className="weesstock-card__fact-sub"> · {pct(data.fulfilment_rate)} completed</span>
+              <span className="weesstock-card__fact-sub"> · {marketPct(data.fulfilment_rate)} completed</span>
             )}
           </dd>
         </div>
@@ -201,7 +219,7 @@ const ProfileBody: React.FC<{ data: CreditProfileOut }> = ({ data }) => {
         </div>
         <div className="weesstock-card__fact">
           <dt>Trading for</dt>
-          <dd>{tenure(data.tenure_days)}</dd>
+          <dd>{marketTenure(data.tenure_days)}</dd>
         </div>
         <div className="weesstock-card__fact">
           {/* Labelled as excluded ON the card. Inquiries are self-generatable, so they must not
@@ -223,11 +241,10 @@ const ProfileBody: React.FC<{ data: CreditProfileOut }> = ({ data }) => {
  *  draw an arrow at all. */
 const TrendMark: React.FC<{ trend: number | null }> = ({ trend }) => {
   if (trend === null) return null;
-  const delta = trend - 1;
-  if (Math.abs(delta) < TREND_FLAT_BAND) {
+  const { delta, flat, up } = trendDelta(trend);
+  if (flat) {
     return <span className="weesstock-card__trend" data-testid="weesstock-trend" title="Steady">→</span>;
   }
-  const up = delta > 0;
   return (
     <span
       className={`weesstock-card__trend ${up ? 'weesstock-card__trend--up' : 'weesstock-card__trend--down'}`}
@@ -235,7 +252,7 @@ const TrendMark: React.FC<{ trend: number | null }> = ({ trend }) => {
       title={up ? 'Selling faster than your 90-day average' : 'Selling slower than your 90-day average'}
       aria-label={up ? 'Trending up' : 'Trending down'}
     >
-      {up ? '↑' : '↓'} {pct(delta)}
+      {up ? '↑' : '↓'} {marketPct(Math.abs(delta))}
     </span>
   );
 };

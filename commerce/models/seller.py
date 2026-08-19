@@ -13,7 +13,7 @@ client-side, never SQL-joined.
 """
 from geoalchemy2 import Geography
 from sqlalchemy import (
-    Column, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint,
+    Boolean, Column, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -30,6 +30,11 @@ class Seller(Base):
     user_uuid = Column(String, nullable=False, index=True)
     display_name = Column(String(120), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    # WeesStock market consent (§WeesStock F4 — the investor-facing discovery surface). The
+    # seller's credit profile is exposed to investors ONLY after this explicit opt-in; the market
+    # endpoints enforce it (an unlisted seller's id is a uniform 404 — no existence leak).
+    # Reversible, default-off, and the sole gate between a private score and a public listing.
+    weesstock_listed = Column(Boolean, nullable=False, default=False, server_default="false")
 
     shops = relationship("Shop", back_populates="seller", cascade="all, delete-orphan")
 

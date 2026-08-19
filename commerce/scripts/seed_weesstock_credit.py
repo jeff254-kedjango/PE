@@ -474,6 +474,12 @@ def _seed_seller(
     for rating, order in zip(tier.ratings, reversed(settled)):
         if _review_one(db, order, rating):
             reviewed += 1
+
+    # The demo's real sellers opt in to the WeesStock market (§WeesStock F4 — the investor
+    # discovery surface): the market shows only consenting sellers, and a dev stack needs
+    # content. Idempotent — every run re-asserts the same flag (a seller may later unlist via
+    # the API; re-seeding does not fight them).
+    seller.weesstock_listed = True
     db.commit()
 
     return {

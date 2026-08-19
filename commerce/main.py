@@ -35,6 +35,8 @@ from PE.commerce.routers.shop_ranking import router as shop_ranking_router
 # §8 Chunk C: Viewing Card (heartbeat + live-count + view-history) and the Promote-All button.
 # Sits under /shops/{shop_id}/... — the heartbeat is anon-callable, the rest are owner-only.
 from PE.commerce.routers.shop_views import router as shop_views_router
+# WeesStock F4: investor-facing market (consent-gated discovery/analytics — no transactions).
+from PE.commerce.routers.weesstock import router as weesstock_router
 
 logger = logging.getLogger(__name__)
 
@@ -89,3 +91,4 @@ app.include_router(flash_sales_router, prefix="/api/v1", tags=["flash-sales"])
 app.include_router(search_router, prefix="/api/v1", tags=["search"])
 app.include_router(shop_ranking_router, prefix="/api/v1", tags=["ranking"])
 app.include_router(shop_views_router, prefix="/api/v1", tags=["shop-views"])
+app.include_router(weesstock_router, prefix="/api/v1", tags=["weesstock"])

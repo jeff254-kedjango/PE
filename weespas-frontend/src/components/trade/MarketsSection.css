@@ -1,0 +1,190 @@
+/* MarketsSection — the WeeStock Markets glance-grid on /trade.
+ *
+ * Finance-idiom section card matching the rest of the right rail (Quick Buys / Flash Sales):
+ * a titled card with a 2×3 grid of shop tiles. Each tile is a Link to that shop's /markets
+ * quote page: identity on top, the revenue sparkline stretched across the middle, and the
+ * momentum chip + 90-day value along the bottom — the same four zones as a /markets row,
+ * stacked for the narrower tile. Same design-system tokens, no new palette. */
+
+.markets-section {
+  box-sizing: border-box;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 14px;
+  background: var(--color-surface, #ffffff);
+  padding: var(--space-3, 12px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+}
+
+/* The section is mounted TWICE on /trade — once in the feed column (mobile/tablet) and once in
+   the right rail (desktop) — to match the three-column design [trending | feed | WeesStock
+   Markets] while never vanishing on narrower viewports. Which instance shows is decided here:
+
+   Feed-column instance: constrained to the composer/toggle stack (560px cap, centred) and shown
+   only BELOW 1101px, where the rail is display:none. At desktop the rail instance takes over. */
+.trade-page__feed-col .markets-section {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto var(--space-6, 24px);
+}
+
+@media (min-width: 1101px) {
+  .trade-page__feed-col .markets-section {
+    display: none;
+  }
+}
+
+/* Rail instance: fills the rail's width; the rail itself is hidden <1101px, so no extra rule is
+   needed for that breakpoint. */
+.trade-page__rail-right .markets-section {
+  width: 100%;
+}
+
+.markets-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2, 8px);
+}
+
+.markets-section__title {
+  margin: 0;
+  font-size: var(--fs-sm, 14px);
+  font-weight: 700;
+  color: var(--color-text-strong, #111827);
+}
+
+/* The arrow button to the full board — arrow icon first, then the label. */
+.markets-section__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-xs, 12px);
+  font-weight: 600;
+  color: var(--color-primary, #2563eb);
+  text-decoration: none;
+}
+
+.markets-section__link:hover,
+.markets-section__link:focus-visible {
+  text-decoration: underline;
+}
+
+.markets-section__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2, 8px);
+}
+
+.markets-section__item {
+  min-width: 0;
+}
+
+/* ---- tile ---- */
+
+.markets-section__tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+  height: 100%;
+  box-sizing: border-box;
+  padding: var(--space-2, 8px) var(--space-2, 8px) var(--space-3, 12px);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 10px;
+  background: var(--color-surface-alt, #f3f4f6);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 160ms ease-out;
+}
+
+.markets-section__tile:hover,
+.markets-section__tile:focus-visible {
+  border-color: var(--color-primary, #2563eb);
+}
+
+.markets-section__tile-id {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.markets-section__tile-name {
+  font-size: var(--fs-sm, 14px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.markets-section__tile-ticker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  font-size: var(--fs-2xs, 11px);
+  color: var(--color-text-muted, #6b7280);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.markets-section__tile-score {
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e5e7eb);
+  font-weight: 600;
+  color: var(--color-text-secondary, #4b5563);
+}
+
+/* The sparkline stretches to the tile's width (the component's fixed 96px default is overridden
+ * here; the viewBox keeps it proportional). */
+.markets-section .market-sparkline {
+  width: 100%;
+  height: 30px;
+  align-self: center;
+}
+
+.markets-section__tile-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2, 8px);
+  margin-top: auto;
+}
+
+.markets-section__tile-value {
+  font-size: var(--fs-xs, 12px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---- states ---- */
+
+.markets-section__state {
+  margin: 0;
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--fs-xs, 12px);
+}
+
+.markets-section__state--error {
+  color: var(--color-danger, #b91c1c);
+}
+
+.markets-section__empty {
+  margin: 0;
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+  line-height: 1.5;
+}
+
+.markets-section__tile-skeleton {
+  height: 132px;
+  border-radius: 10px;
+}

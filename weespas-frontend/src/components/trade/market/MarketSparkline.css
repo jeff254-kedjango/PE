@@ -1,0 +1,16 @@
+/* MarketSparkline — the SVG owns its geometry (viewBox-scaled), so this file only guards the
+   few things CSS should own: the vector stays crisp on any display and the reduced-motion
+   preference is honoured (nothing animates, but the gradient/line are cheap to keep stable). */
+
+.market-sparkline {
+  display: block;
+  flex: 0 0 auto;
+}
+
+.market-sparkline__baseline {
+  vector-effect: non-scaling-stroke;
+}
+
+.market-sparkline__line {
+  vector-effect: non-scaling-stroke;
+}

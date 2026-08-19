@@ -1,0 +1,22 @@
+/* MarketChangeChip — the signed momentum readout shared by the WeesStock market surfaces.
+ * Green up / red down / muted flat is the investor-list convention (the seller's own card keeps
+ * amber for down by design; that is its own stylesheet). */
+
+.market-change {
+  font-size: var(--fs-xs, 12px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.market-change--up {
+  color: var(--color-success, #15803d);
+}
+
+.market-change--down {
+  color: var(--color-danger, #b91c1c);
+}
+
+.market-change--flat {
+  color: var(--color-text-muted, #6b7280);
+}

@@ -1,0 +1,241 @@
+/* MarketsPage — the WeesStock investor market list (/markets).
+ *
+ * Finance-idiom layout adapting the reference screenshots (a quote app's market board):
+ * a "Top" strip of the strongest few, then a ticker list where every row is [identity +
+ * sparkline + change + value]. Same calm-admin chrome as the rest of the app (design-system
+ * tokens, no new palette); the only visual flourish is the sparkline's direction colour,
+ * which is the market's universal red/green convention. */
+
+.markets-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-6, 24px) var(--space-4, 16px) var(--space-8, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+}
+
+.markets-page--gate {
+  align-items: center;
+  text-align: center;
+  padding-top: var(--space-10, 48px);
+}
+
+.markets-page--gate h1 {
+  margin-bottom: var(--space-2, 8px);
+}
+
+.markets-page__cta {
+  margin-top: var(--space-2, 8px);
+}
+
+.markets-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3, 12px);
+  flex-wrap: wrap;
+}
+
+.markets-page__header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text-strong, #111827);
+}
+
+.markets-page__sub {
+  margin: var(--space-1, 4px) 0 0;
+  font-size: var(--fs-sm, 14px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+/* The line that keeps this surface honest: discovery/analytics, not a securities market. */
+.markets-page__regulatory {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 999px;
+  background: var(--color-surface-alt, #f3f4f6);
+  font-size: var(--fs-2xs, 11px);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #6b7280);
+  white-space: nowrap;
+}
+
+.markets-page__state {
+  margin: 0;
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--fs-sm, 14px);
+}
+
+.markets-page__state--error {
+  color: var(--color-danger, #b91c1c);
+}
+
+/* ---- top strip (the strongest few as glanceable chips) ---- */
+
+.markets-page__top {
+  display: flex;
+  gap: var(--space-2, 8px);
+  flex-wrap: wrap;
+}
+
+.markets-page__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: 6px 12px;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 999px;
+  background: var(--color-surface, #ffffff);
+  text-decoration: none;
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-strong, #111827);
+}
+
+.markets-page__chip-name {
+  font-weight: 600;
+}
+
+.markets-page__chip:hover,
+.markets-page__chip:focus-visible {
+  border-color: var(--color-primary, #2563eb);
+}
+
+/* ---- the ticker list ---- */
+
+.markets-page__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.markets-page__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 16px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 14px;
+  background: var(--color-surface, #ffffff);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 160ms ease-out;
+}
+
+.markets-page__row:hover,
+.markets-page__row:focus-visible {
+  border-color: var(--color-primary, #2563eb);
+}
+
+/* Identity block takes the left, sparkline the middle, change+value the right — the exact
+   four-zone row of the reference screenshots. */
+.markets-page__row-id {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.markets-page__row-name {
+  font-size: var(--fs-md, 16px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.markets-page__row-ticker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+.markets-page__row-score {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--color-surface-alt, #f3f4f6);
+  font-weight: 600;
+  color: var(--color-text-secondary, #4b5563);
+}
+
+.markets-page__row-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+.markets-page__row-value {
+  font-size: var(--fs-sm, 14px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- breadcrumb (back to /trade) ---- */
+
+.markets-page__crumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  font-size: var(--fs-sm, 14px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+.markets-page__crumb a {
+  color: var(--color-primary, #2563eb);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.markets-page__crumb a:hover,
+.markets-page__crumb a:focus-visible {
+  text-decoration: underline;
+}
+
+.markets-page__crumb-sep {
+  color: var(--color-text-muted, #6b7280);
+}
+
+.markets-page__crumb-current {
+  color: var(--color-text-secondary, #4b5563);
+}
+
+/* ---- empty + foot ---- */
+
+.markets-page__empty {
+  padding: var(--space-6, 24px);
+  border: 1px dashed var(--color-border, #e5e7eb);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.markets-page__empty-title {
+  margin: 0;
+  font-size: var(--fs-md, 16px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+}
+
+.markets-page__empty-sub {
+  margin: var(--space-1, 4px) 0 0;
+  font-size: var(--fs-sm, 14px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+.markets-page__foot {
+  margin: 0;
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+}

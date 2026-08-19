@@ -1,0 +1,311 @@
+/* MarketDetailPage — the WeesStock quote page (/markets/:sellerId).
+ *
+ * Finance-quote idiom, same design tokens as the seller card: the score is the headline
+ * price, the momentum chip sits under it, the revenue chart is the tape, and the facts are
+ * a quote-page stats grid. No new palette. */
+
+.market-detail {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: var(--space-6, 24px) var(--space-4, 16px) var(--space-8, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+}
+
+.market-detail--gate {
+  align-items: center;
+  text-align: center;
+  padding-top: var(--space-10, 48px);
+}
+
+.market-detail__cta {
+  margin-top: var(--space-2, 8px);
+}
+
+.market-detail__back {
+  align-self: flex-start;
+  font-size: var(--fs-sm, 14px);
+  font-weight: 600;
+  color: var(--color-text-secondary, #4b5563);
+  text-decoration: none;
+}
+
+.market-detail__back:hover,
+.market-detail__back:focus-visible {
+  color: var(--color-primary, #2563eb);
+}
+
+.market-detail__state {
+  margin: 0;
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--fs-sm, 14px);
+}
+
+.market-detail__state--error {
+  color: var(--color-danger, #b91c1c);
+}
+
+/* ---- quote header ---- */
+
+.market-detail__quote {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4, 16px);
+  flex-wrap: wrap;
+}
+
+.market-detail__quote-left {
+  min-width: 0;
+}
+
+.market-detail__name {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--color-text-strong, #111827);
+}
+
+.market-detail__owner {
+  margin: var(--space-1, 4px) 0 0;
+  font-size: var(--fs-sm, 14px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+.market-detail__price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2, 8px);
+}
+
+.market-detail__score {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-text-strong, #111827);
+  font-variant-numeric: tabular-nums;
+}
+
+.market-detail__score-max {
+  font-size: var(--fs-sm, 14px);
+  font-weight: 500;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.market-detail__momentum {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  padding: 2px 8px;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 999px;
+  background: var(--color-surface-alt, #f3f4f6);
+}
+
+.market-detail__momentum-label {
+  font-size: var(--fs-2xs, 11px);
+  color: var(--color-text-muted, #6b7280);
+}
+
+.market-detail__trend {
+  font-size: var(--fs-xs, 12px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.market-detail__trend--up {
+  color: var(--color-success, #15803d);
+}
+
+/* Investor view keeps the market's red-for-down convention (the seller's own card is amber —
+   different reader, different idiom). */
+.market-detail__trend--down {
+  color: var(--color-danger, #b91c1c);
+}
+
+.market-detail__pending {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.market-detail__pending-label {
+  font-size: var(--fs-lg, 20px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+}
+
+.market-detail__pending-hint {
+  font-size: var(--fs-sm, 14px);
+  color: var(--color-text-secondary, #4b5563);
+}
+
+/* ---- cards (chart + breakdown) ---- */
+
+.market-detail__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+  padding: var(--space-4, 16px);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 16px;
+  background: var(--color-surface, #ffffff);
+}
+
+.market-detail__card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2, 8px);
+}
+
+.market-detail__card-title {
+  margin: 0;
+  font-size: var(--fs-md, 16px);
+  font-weight: 700;
+  color: var(--color-text-strong, #111827);
+}
+
+.market-detail__card-meta {
+  font-size: var(--fs-2xs, 11px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.market-detail__chart-stats {
+  display: flex;
+  gap: var(--space-6, 24px);
+  margin: 0;
+}
+
+.market-detail__chart-stat dt {
+  font-size: var(--fs-2xs, 11px);
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.market-detail__chart-stat dd {
+  margin: 2px 0 0;
+  font-size: var(--fs-sm, 14px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- component bars ---- */
+
+.market-detail__components {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.market-detail__component-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2, 8px);
+  margin-bottom: 3px;
+}
+
+.market-detail__component-label {
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-secondary, #4b5563);
+}
+
+.market-detail__component-weight {
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+  font-variant-numeric: tabular-nums;
+}
+
+.market-detail__bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-surface-alt, #f3f4f6);
+  overflow: hidden;
+}
+
+.market-detail__bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-primary, #2563eb);
+  transition: width 240ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .market-detail__bar-fill {
+    transition: none;
+  }
+}
+
+/* ---- facts grid ---- */
+
+.market-detail__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-3, 12px);
+  margin: 0;
+  padding: var(--space-4, 16px);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 16px;
+  background: var(--color-surface, #ffffff);
+}
+
+.market-detail__fact dt {
+  font-size: var(--fs-2xs, 11px);
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.market-detail__fact dd {
+  margin: 2px 0 0;
+  font-size: var(--fs-sm, 14px);
+  font-weight: 600;
+  color: var(--color-text-strong, #111827);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- foot: the honesty line + a way into the real shop ---- */
+
+.market-detail__foot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4, 16px);
+  flex-wrap: wrap;
+}
+
+.market-detail__note {
+  margin: 0;
+  font-size: var(--fs-xs, 12px);
+  color: var(--color-text-muted, #6b7280);
+  max-width: 56ch;
+}
+
+.market-detail__visit {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--color-primary, #2563eb);
+  color: #ffffff;
+  font-size: var(--fs-sm, 14px);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.market-detail__visit:hover,
+.market-detail__visit:focus-visible {
+  background: var(--color-primary-dark, #1d4ed8);
+}

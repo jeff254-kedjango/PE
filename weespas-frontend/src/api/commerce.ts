@@ -938,6 +938,125 @@ export async function getMyCreditProfile(
   );
 }
 
+// ----------------------------- WeesStock market (§F4, investor discovery) -----------------------------
+//
+// The investor-facing discovery/analytics surface — the stock-exchange-for-SMEs direction
+// (NSE serves only the top of the market; this is the honest data layer under that goal).
+// Discovery/analytics ONLY: nothing here transacts. Investment actions live behind a separate,
+// clearly-labelled, regulatory-aware surface (Kenya: Capital Markets (Investment-Based
+// Crowdfunding) Regulations 2022).
+//
+// The exposure boundary is the seller's OWN opt-in (Seller.weesstock_listed, default off):
+// the list returns consenting sellers only, and an unlisted seller's detail view 404s exactly
+// like an unknown one — probing never confirms an unlisted shop exists. The market's numbers
+// are computed by the SAME scorer as the seller's own card, so the two can never disagree.
+
+/** Weekly verified-revenue buckets over the 90-day window, oldest→newest. The last bucket is
+ *  the current (partial) week. Points are aggregate NET-to-seller cents — the same money the
+ *  credit score is built from, so the chart can never disagree with the score's revenue term. */
+export interface RevenueSeries {
+  series_cents: number[];
+  bucket_days: number;
+  bucket_count: number;
+  window_days: number;
+  currency: string;
+}
+
+/** One row of the market list — a ticker in the investor UI. Compact by design (scrollable
+ *  list): the score (the sort key), the money the market reads (90-day verified revenue), the
+ *  momentum (30d vs 90d run-rate), the buyer-side rating, and the sparkline series. */
+export interface MarketEntryOut {
+  seller_id: string;
+  seller_name: string;
+  shop_name: string;
+  category: string | null;
+  /** The composite, withheld on a thin file exactly as on the seller's own card. */
+  score: number | null;
+  is_scoreable: boolean;
+  currency: string;
+  revenue_cents: number;
+  revenue_trend: number | null;
+  rating: number;
+  rating_count: number;
+  series: RevenueSeries;
+}
+
+/** GET /weesstock/markets — every consenting seller, strongest-first, bounded + deterministic. */
+export interface MarketListOut {
+  entries: MarketEntryOut[];
+  window_days: number;
+  /** The reference a full revenue bar means (KES 50k/month — services/credit_score.py). */
+  revenue_saturation_cents: number;
+}
+
+/** The seller's own WeesStock market consent — the read/write shape of the opt-in switch. */
+export interface ListingToggleOut {
+  listed: boolean;
+}
+
+/** One seller's market deep-dive: shop meta + the FULL credit profile (the same shape the
+ *  seller sees on their own card — no divergence) + the revenue series for the chart. */
+export interface MarketDetailOut {
+  seller: {
+    seller_id: string;
+    seller_name: string;
+    shop_name: string;
+    category: string | null;
+  };
+  profile: CreditProfileOut;
+  series: RevenueSeries;
+}
+
+/** Fetch the WeesStock market — every CONSENTING seller's ticker row, strongest-first.
+ *  Requires the commerce session token (same authenticated audience class as the feed; there
+ *  is no token-less path — commerce fails closed). */
+export async function getMarkets(session: CommerceSession): Promise<MarketListOut> {
+  return fetchJson<MarketListOut>(
+    `${apiBase(session.commerce_url)}/weesstock/markets`,
+    { ...crossOrigin, headers: authHeaders(session.token) },
+  );
+}
+
+/** One consenting seller's full WeesStock deep-dive. A 404 is UNIFORM: an unlisted seller's
+ *  id fails exactly like a garbage id, so callers surface one "not on the market" state and
+ *  never reveal whether the shop exists but declined consent. */
+export async function getMarketDetail(
+  session: CommerceSession,
+  sellerId: string,
+): Promise<MarketDetailOut> {
+  return fetchJson<MarketDetailOut>(
+    `${apiBase(session.commerce_url)}/weesstock/markets/${encodeURIComponent(sellerId)}`,
+    { ...crossOrigin, headers: authHeaders(session.token) },
+  );
+}
+
+/** The seller's own current WeesStock market consent — the server is the source of truth for
+ *  the switch's first paint, never a client guess. Owner-only (resolved from the token). */
+export async function getMarketListing(session: CommerceSession): Promise<ListingToggleOut> {
+  return fetchJson<ListingToggleOut>(
+    `${apiBase(session.commerce_url)}/weesstock/me/listing`,
+    { ...crossOrigin, headers: authHeaders(session.token) },
+  );
+}
+
+/** Flip the caller's OWN WeesStock market consent (opt-in to appear on the investor market;
+ *  default off). There is no id parameter — consent can only ever be changed for the token's
+ *  own seller row. Returns the persisted state. */
+export async function setMarketListing(
+  session: CommerceSession,
+  listed: boolean,
+): Promise<ListingToggleOut> {
+  return fetchJson<ListingToggleOut>(
+    `${apiBase(session.commerce_url)}/weesstock/me/listing`,
+    {
+      ...crossOrigin,
+      method: 'POST',
+      headers: { ...authHeaders(session.token), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ listed }),
+    },
+  );
+}
+
 /** Fetch the caller's low-stock product listings, sorted most-urgent-first. */
 export async function getMyLowStock(
   session: CommerceSession,
